@@ -45,16 +45,16 @@ the other.
 
 ### Loading a GEDCOM File
 
-Databases are stored in ./db/<dbname>/<dbname>.\*. There are typically 3 files here:
+Databases are stored in ./db/&lt;dbname&gt;/&lt;dbname&gt;.\*. There are typically 3 files here:
 
-* <dbname>.db - the sqlite database
-* <dbname>.cfg - database specific configuration information
-* <dbname>.about - html about this database that gets displayed as part of the home page for this database
+* &lt;dbname&gt;.db - the sqlite database
+* &lt;dbname&gt;.cfg - database specific configuration information
+* &lt;dbname&gt;.about - html about this database that gets displayed as part of the home page for this database
 
 To load a GEDCOM file, run these commands and then edit mygedcom.cfg (see below for details) and mygedcom.about as appropriate for your GEDCOM:
 
 ```
-bin/load-gedcom < path/to/mygedcom.ged
+bin/load-gedcom &lt; path/to/mygedcom.ged
 mkdir -p db/mygedcom
 mv test.db db/mygedcom/mygedcom.db
 cp sample-db.cfg db/mygedcom/mygedcom.cfg
@@ -67,7 +67,7 @@ In the db-config.js file edit the databases section so it has your database(s) d
 In the example below there are two databases configured 'woodbridge' and
 'woodbridge\_record'. Leave the 'adapter' set to 'sqlite3', in the future this might
 also allow using 'mysql' and/or 'postgresql' databases. Edit the 'database' variable
-to point your database as installed above. And leave "read_only" set to "1" since
+to point your database as installed above. And leave "read\_only" set to "1" since
 we don't need to write to the database.
 
 ```
