@@ -101,16 +101,16 @@ Leave the rest of the file alone.
 
 ### Configuring Login Users
 
-The software has compute if people are living based on the following rules:
+The software will compute if people are living based on the following rules:
 
-* no birth or death date, then presumed dead
+* no birth and no death date, then presumed dead
 * death date, then dead
 * birth but no death and age < 115 years, then presumed living
 
 This is used to hide people in your database that are presumed living unless the user
 has logged into the system. Logged in users can see everything.
 
-Users are configured with static logins configured in the db/<dbname>/<dbname>.cfg file
+Users are configured with static logins configured in the db/&lt;dbname&gt;/&lt;dbname&gt;.cfg file
 in the database directory. the sample-db.cfg you copied has a default user "test" with a password "test", CHANGE THIS!, in the auth section of that file. The admin flag is
 not currently being used but might allow an admin user to make changes in the future.
 
