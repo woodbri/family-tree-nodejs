@@ -3,6 +3,10 @@
 This application is a Node.js webserver that serves family tree information from a GEDCOM loaded into a Sqlite database.
 It can be configured to serve multiple separate databases and each database can its own configuration.
 
+This was built to work with my GEDCOM files and it might need changes and/or additions to work with other GEDCOM files. I use Family Tree Maker as my master repository then export that to GEDCOM files to load into this application.
+
+Collaboration and/or pull requests are welcome.
+
 ## Installation
 
 ### Package Dependencies
@@ -54,7 +58,7 @@ Databases are stored in ./db/&lt;dbname&gt;/&lt;dbname&gt;.\*. There are typical
 To load a GEDCOM file, run these commands and then edit mygedcom.cfg (see below for details) and mygedcom.about as appropriate for your GEDCOM:
 
 ```
-bin/load-gedcom &lt; path/to/mygedcom.ged
+bin/load-gedcom < path/to/mygedcom.ged
 mkdir -p db/mygedcom
 mv test.db db/mygedcom/mygedcom.db
 cp sample-db.cfg db/mygedcom/mygedcom.cfg
