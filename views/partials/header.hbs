@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="charset" content="utf-8">
+{{#if expires}}
+<meta http-equiv="expires" content="{{expires}}">
+{{/if}}
+<meta name="title" content="Genealogy Web Server">
+<meta name="Author" content="Stephen Woodbridge">
+<meta name="Copyright" content="Copyright {{year}}, All Rights Reserved.">
+<meta name="generator" content="node.js version: {{version}}, The Genealogy Web Server">
+<meta name="Abstract" content="The Genealogy Web Server provides web users access to an extensive genealogy database. It provides interactive pedigree charts and descendants tables, full search and tree navigation features.">
+<META NAME="ROBOTS" CONTENT="INDEX, FOLLOW">
+
+<title>{{title}}</title>
+<link rel='stylesheet' href='/stylesheets/style.css'/>
+
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16" />
+<link rel="icon" type="image/x-icon" href="/images/favicon.ico" sizes="16x16" />
+
+</head>
+<body>
+    <h1 align=center><a href="/{{dbName}}/">{{title}}</a></h1>
+<table class=tableback width="99%" border=0 cellspacing=0 cellpadding=1 align=center><tr><td>
+<table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3><tr>
+<td align=center>
+{{#if dbName}}
+    <a href="/{{dbName}}/about" title="Click here for more info ...">About</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a href="/{{dbName}}/help" title="Click here for more info ...">Help</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a href="/{{dbName}}/surnames" title="Click here for Surnames ...">Surnames</a>
+{{else}}
+    About
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Help
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Surnames
+{{/if}}
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+{{#if indi.indi}}
+    <a href="/{{dbName}}/descendants/{{indi.indi}}" title="Click here to see this person's descendants ...">Descendants</a>
+{{else}}
+    Descendants
+{{/if}}
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+{{#if dbName}}
+    <a href="/{{dbName}}/search" title="Click here to search the database ...">Search</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a href="/{{dbName}}/birthdays?year=all" title="List people by their birthdays">Birthdays</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    {{#if feedbackOK}}
+    <a href="/{{dbName}}/feedback?ref={{{current_url}}}" title="Leave database owner comments and suggestions">Feedback</a>
+    {{else}}
+    Feedback
+    {{/if}}
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <a href="/{{dbName}}/{{login}}?ref={{{current_url}}}">{{login2}}</a></td>
+{{else}}
+    Search
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Birthdays
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Feedback
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Login
+{{/if}}
+    </tr></table></td>
+</tr></table>
+<div>&nbsp;</div>

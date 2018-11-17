@@ -1,0 +1,42 @@
+<table align=center width="98%" border=0 cellpadding=2><tr><td>
+
+<h2>URL HELP Information</h2>
+
+<p>The following gives information on how to construct URLs that can be used to link to the Genealogy Web Server and on options that control how some data is displayed. The basic URL is constructed from this template:</p>
+
+<ul>
+<p>http://example.com/<b>DATABASE</b>/<b>COMMAND</b>/<b>CVALUE</b>[?<b>OPTION</b>=<b>OVALUE</b>[&amp;<b>OPTION</b>=<b>OVALUE</b>...]]</p>
+</ul>
+<p>where:</p>
+<ul>
+<p><b>DATABASE</b>:<br>The name of a genealogy database loaded on the server. To see what databases are loaded go to <a href="http://{{server}}/">http://{{server}}/</a>.</p>
+<p><b>COMMAND</b>:</p>
+<ul>
+<p><b>about</b><br>Shows the about and general help page.</p>
+<p><b>help</b><br>Shows this page.</p>
+<p><b>surnames</b><br>Shows the surnames page.</p>
+<p><b>search</b><br>Shows the search input form page.</p>
+<p><b>birthdays</b> The following options my be added to this command.</p>
+<ul>
+<p><b>year</b>=[<b>all</b>|<b>living</b>|&lt;YYYY&gt;]<br>Shows people sorted by their birthday since <b>YYYY</b> or <b>all</b> or <b>living</b> people in the database.</p>
+<p><b>byname</b>=1&nbsp;&nbsp;Sort the resulting list by Name instead of by dates.</p>
+<p><b>day</b>=MM-DD&nbsp;&nbsp;Show only people that share this birthday.</p>
+</ul>
+</p></p>
+<p><b>feedback</b><br>Shows a form to send feedback to the database owner.</p>
+<p><b>names</b>/&lt;SURNAME&gt;<br>Show a list of all people with the given &lt;SURNAME&gt;. The &lt;SURNAME&gt; may be '_' in which case a list of all people without a &lt;SURNAME&gt; will be generated. &lt;SURNAME&gt; is case insensitive.</p>
+<p><b>indi</b>/&lt;INDI&gt;<br>Show the individual identified by the unique identifier &lt;INDI&gt;. These tend to be of the form "Innnn", where nnnn is a four digit number.</p>
+<p><b>descendants</b>/&lt;INDI&gt;<br>Shows all of the descendants of the individual &lt;INDI&gt; The following options may be added to this command.</p>
+<ul>
+<p><b>indi</b>=1&nbsp;&nbsp;Add the &lt;INDI&gt; identifier to each person.</p>
+<p><b>refn</b>=1&nbsp;&nbsp;Add the &lt;REFN&gt; identifier to each person.</p>
+<p><b>dates</b>=1&nbsp;&nbsp;Add (birth - death) to each person.</p>
+<p><b>max</b>=&lt;nn&gt;&nbsp;&nbsp;Limit the display to a maximum of <b>nn</b> generations below the person. The default is 20.</p>
+</ul>
+</ul>
+
+<p>&nbsp;</p>
+<p>Please feel free to contact me, <a href="stephenwoodbridge37 (at) gmail (dot) com">Stephen Woodbridge</a>, at stephenwoodbridge37 (at) gmail (dot) com.</p>
+
+</td></tr>
+</table>

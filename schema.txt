@@ -1,0 +1,72 @@
+
+/*
+CREATE TABLE indi(
+    INDI varchar(10) NOT NULL,
+    LNAME varchar(30) ,
+    FNAME varchar(60) ,
+    TITLE varchar(20) ,
+    LNAME_MP varchar(4) ,
+    FAMC varchar(10) ,
+    SEX char(1) ,
+    REFN varchar(20) ,
+    NOTE varchar(10) ,
+    PRIMARY KEY (INDI));
+
+CREATE TABLE child(
+    FAMI varchar(10) NOT NULL,
+    SEQ integer PRIMARY KEY,
+    INDI varchar(10) NOT NULL);
+
+CREATE TABLE fami(
+    FAMI varchar(10) NOT NULL,
+    HUSB varchar(10),
+    WIFE varchar(10),
+    NOTE varchar(10),
+    PRIMARY KEY (FAMI));
+
+CREATE TABLE fams(
+    INDI varchar(10) NOT NULL,
+    SEQ integer PRIMARY KEY,
+    FAMI varchar(10) NOT NULL);
+
+CREATE TABLE notes(
+    NOTE varchar(10) NOT NULL,
+    SEQ integer PRIMARY KEY,
+    TEXT varchar(255));
+
+CREATE TABLE sour(
+    SOUR varchar(10) NOT NULL,
+    TITL varchar(255),
+    AUTH varchar(255),
+    PUBL varchar(1024),
+    REPO varchar(255),
+    PRIMARY KEY (SOUR));
+
+CREATE TABLE events(
+    REFID varchar(10) NOT NULL,
+    SEQ integer PRIMARY KEY,
+    ETYPE varchar(30) NOT NULL,
+    DATE varchar(255),
+    PLAC varchar(255),
+    NOTE varchar(10),
+    TEXT varchar(255));
+
+CREATE TABLE sourtxt(
+    REFID varchar(10) NOT NULL,
+    SEQ integer PRIMARY KEY,
+    SOURID varchar(10),
+    TEXT varchar(255));
+
+CREATE INDEX indi_idx on child (indi);
+CREATE INDEX wife_idx on fami (wife);
+CREATE INDEX husb_idx on fami (husb);
+CREATE INDEX fami_idx on fams (fami);
+CREATE INDEX child_idx on child (fami, seq);
+CREATE INDEX fams_idx on fams (indi, seq);
+CREATE INDEX notes_idx on notes (note, seq);
+CREATE INDEX events_refid_idx on sourtxt (refid, seq);
+CREATE INDEX sourtxt_refid_idx on sourtxt (refid, seq);
+
+*/
+
+

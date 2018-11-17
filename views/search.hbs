@@ -1,0 +1,91 @@
+
+<table align=center width="98%" border=0 cellpadding=2><tr><td>
+<form method="get">
+    <table border="0">
+        <tr>
+            <td>Search for: </td>
+            <td><input type="text" size="50" name="string" value="{{query.string}}"></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="radio" name="stype" value="0" {{#compare query.stype "==" "0"}}checked{{/compare}}>&nbsp;Exact<br>
+                <input type="radio" name="stype" value="1" {{#compare query.stype "==" "1"}}checked{{/compare}}>&nbsp;Contains (this is always used for Notes and Sources)<br>
+                <input type="radio" name="stype" value="2" {{#compare query.stype "==" "2"}}checked{{/compare}}>&nbsp;or fuzzy search on last name<br>
+                <input type="checkbox" name="case" value="1" {{#if query.case}}checked{{/if}}>&nbsp;Ignore case<br>
+            </td>
+        </tr><td>&nbsp;</td>
+        <tr>
+        </tr>
+        <tr>
+            <td valign=top>Search in: </td>
+            <td><input type="checkbox" name="inNames"  value="1" {{#if query.inNames}}checked{{/if}}>&nbsp;Names and titles<br>
+            <input type="checkbox" name="inPlaces" value="1" {{#if query.inPlaces}}checked{{/if}}>&nbsp;Places<br>
+            <input type="checkbox" name="inDates"  value="1" {{#if query.inDates}}checked{{/if}}>&nbsp;Dates<br>
+            <input type="checkbox" name="inNotes"  value="1" {{#if query.inNotes}}checked{{/if}}>&nbsp;Notes<br>
+            <input type="checkbox" name="inSources"  value="1" {{#if query.inSources}}checked{{/if}}>&nbsp;Sources<br>
+            </td>
+        </tr>
+    </table>
+    <div class=notes>Please click <input type="submit" value="Submit">
+    to send your query or click <input type="reset" name="Reset" value="Reset"> to
+    clear the form of all input data.</p>
+    <p>&nbsp;</p>
+</form>
+
+</td></tr>
+</table>
+<p></p>
+
+<table align="center" width="98%" border="0" cellpadding="2">
+{{#if results.names}}
+<tr><td>
+  <h2>In Names</h2>
+  <ul>
+    {{#each results.names as |rowi|}}
+    <li>{{{rowi}}}
+    {{/each}}
+  </ul>
+</td></tr>
+{{/if}}
+{{#if results.places}}
+<tr><td>
+  <h2>In Places</h2>
+  <ul>
+    {{#each results.places as |rowp|}}
+    <li>{{{rowp}}}
+    {{/each}}
+  </ul>
+</td></tr>
+{{/if}}
+{{#if results.dates}}
+<tr><td>
+  <h2>In Dates</h2>
+  <ul>
+    {{#each results.dates as |rowd|}}
+    <li>{{{rowd}}}
+    {{/each}}
+  </ul>
+</td></tr>
+{{/if}}
+{{#if results.notes}}
+<tr><td>
+  <h2>In Notes</h2>
+  <ul>
+    {{#each results.notes as |rown|}}
+    <li>{{{rown}}}
+    {{/each}}
+  </ul>
+</td></tr>
+{{/if}}
+{{#if results.sources}}
+<tr><td>
+  <h2>In Sources</h2>
+  <ul>
+    {{#each results.sources as |rows|}}
+    <li>{{{rows}}}
+    {{/each}}
+  </ul>
+</td></tr>
+{{/if}}
+</table>
+

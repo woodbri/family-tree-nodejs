@@ -1,0 +1,11 @@
+<table align=center width="98%" border=0 cellpadding=2><tr><td>
+<table cellpadding=1 cellspacing=0 width=95%>
+
+{{#each rows}}
+<tr><td valign=top>{{#if this.presumed}}Presumed Living</td><td></td><td></td>{{else}}<a href="/{{../dbName}}/indi/{{this.indi}}">{{this.name}}</a></td><td valign=top>{{this.dates}}</td><td valign=top>{{{this.photos}}}</td>{{/if}}</tr>
+{{/each }}
+
+</table>
+
+</td></tr>
+</table>

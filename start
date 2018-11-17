@@ -1,0 +1,2 @@
+#!sh
+DEBUG=family-tree-nodejs:* node ./bin/www

@@ -1,0 +1,101 @@
+{{#if presumed}}
+<h2>Presumed Living</h2>
+{{else}}
+{{#with indi}}
+<table align=center width="98%" border=0 cellpadding=2><tr><td>
+<h2>{{lname}}, {{fname}}</h2>
+<p>
+{{#if note}}
+[<a href="/{{../dbName}}/notes/{{note}}_{{indi}}">NOTES</a>] 
+{{/if}}
+{{#each sources as |src|}}
+<a href="/{{../../dbName}}/source/{{src.seq}}">[S]</a> 
+{{/each}}
+</p>
+
+<ul>
+{{#each events as |e|}}
+<li><I>{{e.etype}}: </I>{{#if e.date}}{{e.date}}{{/if}}{{#if e.place}} - {{e.place}}{{/if}}{{#if e.note}} [<a href="/{{../dbName}}/{{e.note}}">[Note]</a>]{{/if}}
+{{/each}}
+{{#each stats as |s|}}
+{{#if s.data}}
+<li><I>{{s.name}}: </I>{{s.data}}
+{{/if}}
+{{/each}}
+</ul>
+<div class=p>
+<B>Father: </B>{{#if father.presumed}}Presumed Living{{else}}{{#if father.indi}}<a href="/{{../dbName}}/indi/{{father.indi}}">{{father.lname}}, {{father.fname}}</a>{{/if}}{{/if}}<BR>
+<B>Mother: </B>{{#if mother.presumed}}Presumed Living{{else}}{{#if mother.indi}}<a href="/{{../dbName}}/indi/{{mother.indi}}">{{mother.lname}}, {{mother.fname}}</a>{{/if}}{{/if}}<BR>
+</div>
+
+{{#each families as |fam|}}
+<div class=p>
+<br><B>Family {{inc @index}} : </B>{{#if fam.spouse.presumed}}Presumed Living{{else}}<a href="/{{../../dbName}}/indi/{{fam.spouse.indi}}">{{fam.spouse.lname}}, {{fam.spouse.fname}}</a>{{/if}}
+{{#if fam.spouse.presumed}}{{else}}
+{{#if fam.sources}}
+{{#each fam.sources as |seq|}}
+ <a href="/{{../../../dbName}}/source/{{seq}}">[S]</a>
+{{/each}}
+{{/if}}
+{{/if}}
+ </div>
+
+{{#if fam.spouse.presumed}}{{else}}
+ <ul>
+{{#each fam.events as |evt|}}
+ <li><I>{{evt.etype}}: </I>{{#if evt.date}}{{evt.date}}{{/if}} - {{#if evt.place}}{{evt.place}}{{/if}}
+{{/each}}
+ </ul>
+ {{/if}}
+
+ <ol>
+ {{#each fam.children as |child|}}
+ <li>{{#if child.presumed}}Presumed Living{{else}}<a href="/{{../../../dbName}}/indi/{{child.indi}}">{{child.lname}}, {{child.fname}}</a> - {{child.sex}}{{/if}}
+ {{/each}}
+ </ol>
+
+ {{/each}}
+ </td>
+ {{#if photos}}
+ <!-- photos here -->
+ {{#each photos as |row|}}
+ <td valign=top width="25%">
+ <table align=center cellspacing=3 cols=3><tr>
+ <td colspan=3 align=center>Click images to enlarge</td></tr><tr>
+ {{#each row as |cell|}}
+ <td align=center valign=top><a href="/{{../../dbName}}/photo/{{cell.pid}}" target=_photos><img src="{{pimage}}" height="{{hgt}}" width="{{wid}}"></a></td>
+ {{/each}}
+ </tr><tr>
+ {{/each}}
+ {{#if morephotos}}
+ </tr><tr><td align=center colspan=3>
+ <a href="/{{dbName}}/photoslist/{{indi}}" target=_photosr> View all {{morephotos}} photos</a></td></tr>
+ {{/if}}
+ </table>
+
+ </td></tr>
+ </table>
+ </td>
+ {{/if}}
+
+ </tr>
+ </table>
+
+ <div>&nbsp;</div>
+ <table class=tableback width="99%" border=0 cellspacing=0 cellpadding=1 valign=center align=center>
+   <tr><td>
+     <table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3>
+       <tr><td align=center>Pedigree</td></tr>
+     </table>
+ </td></tr>
+ </table>
+ <div>&nbsp;</div>
+ <div>
+ <pre>
+ {{{pedigree}}}
+ </pre>
+ </div>
+ </td></tr>
+ </table>
+{{/with}}
+{{/if}}

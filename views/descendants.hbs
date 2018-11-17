@@ -1,0 +1,19 @@
+<table align=center width="98%" border=0 cellpadding=2>
+<tr><td align="right">
+<form method="get">
+<input type="checkbox" {{#if query.dates}}checked{{/if}} name="dates">Dates |
+<input type="checkbox" {{#if query.refn}}checked{{/if}} name="refn"> Refn |
+<input type="checkbox" {{#if query.indi}}checked{{/if}} name='indi'> Indi |
+<input type="text" name="max" size="4" value="{{query.max}}"> Depth |
+<input type="submit" value="Update">
+</form>
+</td></tr>
+<tr><td>
+<h2>Descendants of {{{name}}}</h2>
+
+<pre>
+{{{line}}}
+</pre>
+
+</td></tr>
+</table>

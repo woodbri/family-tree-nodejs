@@ -1,0 +1,16 @@
+<h1>Select a Family Database</h1>
+<p>Currently the follow databases are loaded. Click on the database name to select that database. Click on the owner's name to email them.</p>
+<div>
+<table border="1" cellpadding="5">
+  <tr>
+    <th>Database</th>
+    <th>Owner</th>
+  </tr>
+  {{#each dbs}}
+    <tr>
+      <td><a href="/{{this.name}}/">{{this.title}}</a></td>
+      <td><a href="mailto:{{this.email}}">{{this.owner}}</a></td>
+    </tr>
+  {{/each}}
+  </table>
+</div>

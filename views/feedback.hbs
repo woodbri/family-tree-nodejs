@@ -1,0 +1,29 @@
+
+<table align=center width="98%" border=0 cellpadding=2><tr><td>
+
+<ul>
+<form method="post" name="Feedback_Form" action="/{{dbName}}/feedback">
+    <input type="hidden" name="ref" value="{{query.ref}}">
+    <table border="0">
+        <tr>
+            <td align=right>Name :</td>
+            <td><input type="text" size="30" name="fname" value="{{fname}}"></td>
+        </tr>
+        <tr>
+            <td align=right>Email Address :</td>
+            <td><input type="text" size="30" name="femail" value="{{femail}}"></td>
+        </tr>
+    </table>
+    <p class=notes>Please enter comments, questions and/or suggestions:</p>
+    <p class=notes><textarea name="fcomments" rows="10" cols="60" wrap=soft>{{fcomments}}</textarea></p>
+    <!--
+    <p class=notes>Enter this number <img src="/captcha-img2.php"> here: <input type="text" size="10" name="captcha"></p>
+    -->
+    <div class=notes>Please click <input type="submit" name="Submit" value="Submit">
+    to send your comments or click <input type="reset" name="Reset" value="Reset"> to
+    clear the form of all input data.</p>
+    <p>&nbsp;</p>
+</form>
+</ul>
+                                                                                                                        </td></tr>
+</table>

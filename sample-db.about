@@ -1,0 +1,4 @@
+<h2>My Genealogy</h2>
+<p>Description of your genealogy database. You can include references to people in the database using like <a href="/mygedcom/indi/Innnn">Person's Name</a>. Where <b>Innnn</b> is the individual's Id as seem in the database. Look up the person via the Surnames and Names pages and click on the person, the URL is what needs to go into the link above.</p>
+
+<p>Login Button on the menu bar above is a generic feature of this software, but for this database it does not hide any information.</p>

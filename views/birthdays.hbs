@@ -1,0 +1,28 @@
+<table align="center" width="98%" border="0" cellpadding="2">
+<tr><td align="right">
+<form method="get">
+Max Year (all|living|YYYY): <input type="text" size="6" {{#if query.year}}value="{{query.year}}" {{/if}}name="year"> |
+Day (MM-DD|blank}: <input type="text" size="6" {{#if query.day}}value="{{query.day}}" {{/if}}name="day"> |
+<input type="checkbox" {{#if query.byname}}checked{{/if}} name="byname"> Sort by Names |
+<input type="submit" value="Update">
+</form>
+</td></tr>
+<tr><td>
+
+<center>
+<h2>Birthdays{{#if day}} for {{day}}{{/if}}</h2>
+</center>
+
+<table border="0">
+{{#each rows}}
+    <tr>
+    <td valign="top"><a href="/{{../dbName}}/indi/{{indi}}">{{name}}</a></td>
+    <td valign="top">&nbsp;&nbsp;</td>
+    <td valign="top">{{date}}</td>
+    <td valign="top"></td>
+    </tr>
+{{/each}}
+</table>
+
+</td></tr>
+</table>

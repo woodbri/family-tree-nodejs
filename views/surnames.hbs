@@ -1,0 +1,61 @@
+<table align=center width="98%" border=0 cellpadding=2>
+<tr><td>
+  <table width="100%">
+  <tr>
+    <td><a href="#A" title="Jump to the A&#39;s"><b>A</b></a></td>
+    <td><a href="#B" title="Jump to the B&#39;s"><b>B</b></a></td>
+    <td><a href="#C" title="Jump to the C&#39;s"><b>C</b></a></td>
+    <td><a href="#D" title="Jump to the D&#39;s"><b>D</b></a></td>
+    <td><a href="#E" title="Jump to the E&#39;s"><b>E</b></a></td>
+    <td><a href="#F" title="Jump to the F&#39;s"><b>F</b></a></td>
+    <td><a href="#G" title="Jump to the G&#39;s"><b>G</b></a></td>
+    <td><a href="#H" title="Jump to the H&#39;s"><b>H</b></a></td>
+    <td><a href="#I" title="Jump to the I&#39;s"><b>I</b></a></td>
+    <td><a href="#J" title="Jump to the J&#39;s"><b>J</b></a></td>
+    <td><a href="#K" title="Jump to the K&#39;s"><b>K</b></a></td>
+    <td><a href="#L" title="Jump to the L&#39;s"><b>L</b></a></td>
+    <td><a href="#M" title="Jump to the M&#39;s"><b>M</b></a></td>
+    <td><a href="#N" title="Jump to the N&#39;s"><b>N</b></a></td>
+    <td><a href="#O" title="Jump to the O&#39;s"><b>O</b></a></td>
+    <td><a href="#P" title="Jump to the P&#39;s"><b>P</b></a></td>
+    <td><a href="#Q" title="Jump to the Q&#39;s"><b>Q</b></a></td>
+    <td><a href="#R" title="Jump to the R&#39;s"><b>R</b></a></td>
+    <td><a href="#S" title="Jump to the S&#39;s"><b>S</b></a></td>
+    <td><a href="#T" title="Jump to the T&#39;s"><b>T</b></a></td>
+    <td><a href="#U" title="Jump to the U&#39;s"><b>U</b></a></td>
+    <td><a href="#V" title="Jump to the V&#39;s"><b>V</b></a></td>
+    <td><a href="#W" title="Jump to the W&#39;s"><b>W</b></a></td>
+    <td><a href="#X" title="Jump to the X&#39;s"><b>X</b></a></td>
+    <td><a href="#Y" title="Jump to the Y&#39;s"><b>Y</b></a></td>
+    <td><a href="#Z" title="Jump to the Z&#39;s"><b>Z</b></a></td>
+  </tr>
+  </table>
+  <p>&nbsp;</p>
+  <div>
+    <center><a href="/{{dbName}}/names/_/" title="Click to see everyone without a last name">Unknown Last Names</a> ({{unknown}})</center>
+  </div>
+  <p>&nbsp;</p>
+
+{{#each tables as |table|}}
+<a name="{{table.letter}}">
+<table width="100%">
+<tr>
+<td width=10 valign=top><font size="+2">{{table.letter}}</font></td>
+<td>
+    <table width="100%" cols=5>
+    {{#each table.rows as |row|}}
+    </tr><tr>
+        {{#each row as |cell|}}
+        <td width="20%"><a href="/{{../../../dbName}}/names/{{cell.safename}}/" title="Click to see everone named {{{cell.name}}}">{{{cell.name}}}</a> ({{cell.cnt}})</td>
+        {{/each}}
+
+    {{/each}}
+
+    </tr></table>
+</tr></table>
+<p>
+{{/each}}
+
+
+</td></tr>
+</table>

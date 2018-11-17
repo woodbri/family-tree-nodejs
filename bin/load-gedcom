@@ -1,0 +1,1030 @@
+#!/usr/bin/env node
+/*
+ * load-gedcom < file.ged
+ * writes to test.db
+ *
+*/
+
+var DEBUG = false;
+var VERBOSE = true;
+
+var gedcom = require('parse-gedcom'),
+    concat = require('concat-stream');
+
+var metaphone = require('metaphone');
+
+// Select the database you want to use and define an appropriate connection string for it
+// mysql|postgresql|sqlite3
+
+var useDB = 'sqlite3'
+var anyDB;
+var dbURL;
+
+switch (useDB) {
+    case 'postgresql':
+        // npm install any-db-postgres any-db
+        anyDB = require('any-db-postgres');
+        dbURL = 'postgresql://test:test@192.168.99.100:5432/test';
+        break;
+    case 'sqlite3':
+        // npm install any-db-sqlite3 any-db
+        anyDB = require('any-db-sqlite3');
+        dbURL = 'sqlite3://test.db?OPEN_CREATE';
+        dbURL = 'sqlite3://test.db?OPEN_READWRITE&OPEN_CREATE';
+        dbURL = 'sqlite3://localhost/test.db';
+        dbURL = {
+            adapter:  'sqlite3',
+            host:     '',
+            port:     '',
+            database: 'test.db',
+            user:     '',
+            password: ''
+        };
+        break;
+    case 'mysql':
+        // npm install any-db-mysql any-db
+        anyDB = require('any-db-mysql');
+        dbURL = 'mysql://test:test@192.168.99.100:3307/test';
+        break;
+    default:
+        throw 'Invalid database type selection! ('+useDB+')';
+        break;
+}
+
+var conn = anyDB.createConnection(dbURL);
+console.log('Connected to database: ' + dbURL);
+
+// var conn = anyDB.createPool(dbURL, {min:2, max:20})
+
+var stats = {};
+
+process.stdin.pipe(concat(function(buf) {
+    createTables(conn, useDB);
+    console.log('-- Tables created --');
+
+    var input = buf.toString();
+    if (input.charCodeAt(0) == 65279) input = input.substring(1);
+    var ged = gedcom.parse(input);
+
+    conn.query('BEGIN');
+    loadGedcom(conn, ged);
+    conn.query('COMMIT');
+
+    console.log('-- Gedcom Parsed --');
+
+    // console.log(JSON.stringify(stats, null, 2));
+
+    conn.end();
+    console.log('-- Flushing Database queue --');
+}));
+
+
+// ------------------------------------------------------------
+
+/**
+* mapTag(tag)
+*
+* param: tag    - Gedcom TAG to be mapped to a name
+* return string - the mapped name or tag.toLowerCase()
+*/
+function mapTag(tag) {
+var tags = {
+  "NAME": 'Name',
+  "SEX": 'Sex',
+  "BIRT": 'Birth',
+  "DEAT": 'Death',
+  // "FAMS": 'Family of spouse',
+  // "FAMC": 'Family of child',
+  "NOTE": 'Note',
+  "REFN": 'Reference',
+  "TITL": 'Title',
+  "OCCU": 'Occupation',
+  "EVEN": 'Event',
+  "BAPM": 'Baptism',
+  "IMMI": 'Immigration',
+  "ALIA": 'Alias',
+  "SSN": 'Social Security No.',
+  "RESI": 'Residence',
+  "ADOP": 'Adoption',
+  "EMIG": 'Emigration',
+  "ADDR": 'Address',
+  "PHON": 'Phone',
+  "CHR": 'Christening',
+  "WILL": 'Will',
+  "PROB": 'Probate',
+  "CHAN": 'Changed',
+  "CONF": 'Conference',
+  "GRAD": 'Graduation',
+  "ORDN": 'Ordination',
+  "CREM": 'Cremation',
+  "_MILT": 'Military',
+  "RELI": 'Religion',
+  "ARVL": 'Arrival',
+  "DPRT": 'Departure',
+  "CENS": 'Census',
+  // Tags from marriages
+  'HUSB': 'Husband',
+  'WIFE': 'Wife',
+  'CHIL': 'Child',
+  "MARR": 'Marriage',
+  "DIV": 'Divorced',
+  "_SEPR": 'Separated',
+  "ANUL": 'Annulled',
+};
+
+var t = tags[tag];
+if (typeof tags[tag] === 'undefined') {
+    t = tag.toLowerCase();
+}
+
+return t;
+}
+
+/**
+* loadGedcom(conn, ged)
+*
+* Load the gedcom tree produced by parse-gedcom into the database.
+*
+* param: conn  - open connection to the database
+* param: ged   - gedcom tree produced by parse-gedcom
+*/
+function loadGedcom(conn, ged) {
+var indi = 0;
+var fam = 0;
+var note = 0;
+var sour = 0;
+
+for (i in ged) {
+    item = ged[i];
+    switch (item.tag) {
+        case 'INDI':
+            loadIndi(conn, item);
+            indi++;
+            break;
+        case 'FAM':
+            loadFam(conn, item);
+                fam++;
+                break;
+            case 'NOTE':
+                loadNote(conn, item);
+                note++;
+                break;
+            case 'SOUR':
+                loadSour(conn, item);
+                sour++;
+                break;
+            case 'HEAD':
+            case 'SUBM':
+            case 'TRLR':
+                break;
+        }
+    }
+
+    if (DEBUG || VERBOSE) {
+        console.log("indi: " + indi);
+        console.log("fam: " + fam);
+        console.log("note: " + note);
+        console.log("sour: " + sour);
+    }
+}
+
+
+/**
+ * cleanPointer(x)
+ * param: x  - gedcom reference like @I00001@ or @F0001@, etc
+ * return: string with @ removed
+ */
+function cleanPointer(x) {
+    return x.replace(/^@+|@+$/gm, '');
+}
+
+
+/**
+ * splitSurname(n)
+ *
+ * split the name into words and checks if the last word is delimited with '/'
+ *
+ * param: n - the name ins a string with surname delimited with '/' like '/von neuman/'
+ * return: [given_names, surname]
+ */
+function splitSurname(n) {
+    var surname = /\/([^\/]*)\//.exec(n);
+    n = n.replace(/\/([^\/]*)\//, '').trim();
+
+    // console.log(JSON.stringify([n, surname]));
+
+    return [n, surname[1]];
+}
+
+
+/**
+ * getIndi(item)
+ *
+ * Parse an indi subtree and collect information about it into flatter object.
+ *
+ * param: item  - an indi subtree
+ * return: object   - a flatter indi object more suitable to insert into database
+ */
+function getIndi(item) {
+    var indi = {};
+    var refid = cleanPointer(item.pointer);
+    indi['indi'] = refid;
+    indi['even'] = [];
+    indi['fams'] = [];
+    indi['birt'] = {};
+    indi['deat'] = {};
+    var tree = item.tree;
+    for (i in tree) {
+        var tag = tree[i]['tag'];
+        var tag_lc = tag.toLowerCase();
+        switch (tag) {
+            case 'NAME':
+                var names = splitSurname(tree[i]['data']);
+                indi['fname'] = names[0];
+                indi['lname'] = names[1];
+                indi['lname_mp'] = metaphone(names[1]).substring(0,4);
+                break;
+            case 'SEX':
+            case 'REFN':
+            case 'TITL':
+                indi[tag_lc] = tree[i]['data'];
+                break;
+            case 'FAMC':
+            case 'NOTE':
+                indi[tag_lc] = cleanPointer(tree[i]['data']);
+                break;
+            case 'FAMS':
+                indi.fams.push(cleanPointer(tree[i]['data']));
+                break;
+            case 'CHAN':
+                // NOP
+                break;
+            case 'EVEN':
+                indi.even.push(getEvent(tree[i], refid));
+                break;
+            case 'DEAT':
+                var e = makeEvent(tree[i], refid);
+                indi.even.push(e);
+                indi.deat = {tag: tag_lc, date: e.edate};
+                break;
+            case 'BURI':
+                var e = makeEvent(tree[i], refid);
+                indi.even.push(e);
+                if (typeof indi.deat.tag === 'undefined') 
+                    indi.deat = {tag: tag_lc, date: e.edate};
+                break;
+            case 'BIRT':
+                var e = makeEvent(tree[i], refid);
+                indi.even.push(e);
+                indi.birt = {tag: tag_lc, date: e.edate};
+                break;
+            case 'CHR':
+                var e = makeEvent(tree[i], refid);
+                indi.even.push(e);
+                if (typeof indi.birt.tag === 'undefined') 
+                    indi.birt = {tag: tag_lc, date: e.edate};
+                break;
+            case 'MARR':
+            case 'DIV':
+            case '_SEPR':
+            case 'ANUL':
+            default:
+                indi.even.push(makeEvent(tree[i], refid));
+                break;
+        }
+    }
+    
+    return indi;
+}
+
+
+/**
+ * getFam(item)
+ *
+ * Parse an family subtree and collect information about it into flatter object.
+ *
+ * param: item  - a family subtree
+ * return: object   - a flatter family object more suitable to insert into database
+ */
+function getFam(item) {
+    var fami = {};
+    var refid = cleanPointer(item.pointer);
+    fami['fami'] = refid;
+    fami['even'] = [];
+    fami['chil'] = [];
+    var tree = item.tree;
+    for (i in tree) {
+        var tag = tree[i]['tag'];
+        var tag_lc = tag.toLowerCase();
+        switch (tag) {
+            case 'HUSB':
+            case 'WIFE':
+            case 'NOTE':
+                fami[tag_lc] = cleanPointer(tree[i]['data']);
+                break;
+            case 'CHIL':
+                fami.chil.push(cleanPointer(tree[i]['data']));
+                break;
+            case 'EVEN':
+                fami.even.push(getEvent(tree[i], refid));
+                break;
+            case 'DIV':
+            case '_SEPR':
+            case 'ANUL':
+            default:
+                fami.even.push(makeEvent(tree[i], refid));
+                break;
+        }
+    }
+
+    return fami;
+}
+
+
+/**
+ * getEvent(item, refid)
+ *
+ * Parse an event subtree and collect information about it.
+ *
+ * param: item  - an event subtree
+ * param: refid - reference id to the object this event belongs to
+ * return: object - a flatter event object more suitable to insert into database
+ */
+function getEvent(item, refid) {
+    var event = { 'refid': refid };
+    var tree = item.tree;
+    for (i in tree) {
+        var tag = tree[i].tag;
+        var tag_lc = mapTag(tag);
+        switch (tag) {
+            case 'TYPE':
+                event['etype'] = tree[i].data;
+                break;
+            case 'DATE':
+                event['edate'] = formatDate(tree[i].data);
+            case 'PLAC':
+                event[tag_lc] = tree[i].data;
+                break;
+            case 'SOUR':
+                if (typeof event[tag_lc] === 'undefined') {
+                    event[tag_lc] = [getSour(tree[i])];
+                }
+                else {
+                    event[tag_lc].push(getSour(tree[i]));
+                }
+                break;
+            case 'NOTE':
+                event[tag_lc] = cleanPointer(tree[i].data);
+                break;
+            default:
+                text = tag + ": " + tree[i].data;
+                if (typeof event.text === 'undefined') {
+                    event['text'] = text;
+                }
+                else {
+                    event['text'] += '; ' + text;
+                }
+                break;
+        }
+    }
+
+    return event;
+}
+
+
+/**
+ * makeEvent(item, refid)
+ *
+ * Create an event object from things that can be considered events
+ *
+ * param: item  - subtree to convert to an event object
+ * param: refid - reference id to the object this event belongs to
+ * return: object - a flatter event object more suitable to insert into database
+ */
+function makeEvent(item, refid) {
+    var event = { 'refid': refid };
+    event['etype'] = mapTag(item.tag);
+
+    var tree = item.tree;
+    for (i in tree) {
+        var tag = tree[i].tag;
+        var tag_lc = mapTag(tag);
+        switch (tag) {
+            case 'DATE':
+                event['edate'] = formatDate(tree[i].data);
+            case 'PLAC':
+                event[tag_lc] = tree[i].data;
+                break;
+            case 'SOUR':
+                if (typeof event[tag_lc] === 'undefined') {
+                    event[tag_lc] = [getSour(tree[i])];
+                }
+                else {
+                    event[tag_lc].push(getSour(tree[i]));
+                }
+                break;
+            default:
+                text = tag + ": " + tree[i].data;
+                if (typeof event.text === 'undefined') {
+                    event['text'] = text;
+                }
+                else {
+                    event['text'] += '; ' + text;
+                }
+                break;
+        }
+    }
+
+    return event;
+}
+
+
+/**
+ * getSour(item)
+ *
+ * Extract a source reference attached to an indi or fam subtree,
+ *
+ * param: item  - the source item subtree to parse
+ * return: object - a flatter source reference object
+ */
+function getSour(item) {
+    var data = { 'data': [] };
+    if (item.tag != 'SOUR') {
+        return {};
+    }
+    if (item.data.match(/^@/)) {
+        data['refid'] = cleanPointer(item.data);
+    }
+    for (i in item.tree) {
+        if (item.tree[i].data != "") {
+            var d = mapTag(item.tree[i].tag) + ': ' + item.tree[i].data;
+            data.data.push(d);
+        }
+        if (item.tree[i].tree.length > 0) {
+            var subtree = item.tree[i].tree;
+            for (j in subtree) {
+                var d = mapTag(subtree[j].tag) + ': ' + subtree[j].data;
+                data.data.push(d);
+            }
+        }
+    }
+
+    if (DEBUG) {
+       console.log("SOUR: " + JSON.stringify(data, null, 2));
+    }
+
+    return data;
+}
+
+
+/*
+ *
+ *
+ *
+ */
+function formatDate(date) {
+    if (date == null) return null;
+
+    var res = date.match(/\b((\d\d?) (\w\w\w) )?(\d{2,4})\b/i);
+    if (res == null || typeof res[0] === 'undefined')
+        return null;
+
+    var dd = res[0];
+
+    // if we only get a year, then set it to Jan 01
+    if (dd.match(/^\d+$/))
+        dd = '01 JAN ' + dd;
+
+    var d = new Date(dd),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+
+/**
+ * getDate(item)
+ *
+ * Extract a date from item.date if it exists else return null
+ * Use regex to extract a date or year looking substring
+ *
+ * param: item - {tag: 'tag', date: 'date'}
+ */
+function getDate(item) {
+    if (typeof item.date === 'undefined') return null;
+    return formatDate(item.date);
+}
+
+
+/**
+ * isLiving(birth, death)
+ *
+ * Compute if a person is presumed living
+ */
+function isLiving(birth, death) {
+    // if we have a death or burial date then not living
+    if (death == null) {
+
+        // if we have no dates then assume not living
+        if (birth == null) return 0;
+
+        // we have a birth|christening date less the 115 years ago
+        // and no death|burial date assume living
+        var diff = new Date().getFullYear() - new Date(birth).getFullYear();
+        if (diff < 115) return 1;
+    }
+
+    // otherwise not living
+    return 0;
+}
+
+
+/**
+ * loadIndi(conn, item)
+ *
+ * Load an indi subtree in item into the database connection.
+ *
+ * param: conn  - an open database connection
+ * param: item  - and indi subtree from the parse-gedcom object tree
+ */
+function loadIndi(conn, item) {
+
+    if (DEBUG) {
+       console.log(JSON.stringify(item, null, 2));
+    }
+
+    if (VERBOSE) {
+        var t = item.tree;
+        for (i in t) {
+            var tag = t[i]['tag'];
+            if (typeof stats[tag] === 'undefined') {
+                stats[tag] = 1;
+            }
+            else {
+                stats[tag] = stats[tag] + 1;
+            }
+        }
+    }
+
+    var indi = getIndi(item);
+
+    var sql_indi = 'INSERT INTO indi VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    var sql_fams = 'INSERT INTO fams (indi, fami) VALUES (?, ?)';
+    var sql_even = 'INSERT INTO events (refid, etype, date, plac, note, text, edate) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    var sql_stxt = 'INSERT INTO sourtxt (refid, sourid, text) VALUES (?, ?, ?)';
+
+    var birth = ((typeof indi.birt === 'undefined' || typeof indi.birt.date === 'undefined') ? null : indi.birt.date);
+    var death = ((typeof indi.deat === 'undefined' || typeof indi.deat.date === 'undefined') ? null : indi.deat.date);
+
+    var rec = [
+        indi.indi,
+        ((typeof indi.lname === 'undefined') ? null : indi.lname),
+        ((typeof indi.fname === 'undefined') ? null : indi.fname),
+        ((typeof indi.title === 'undefined') ? null : indi.title),
+        ((typeof indi.lname_mp === 'undefined') ? null : indi.lname_mp),
+        ((typeof indi.famc === 'undefined') ? null : indi.famc),
+        ((typeof indi.sex === 'undefined') ? null : indi.sex),
+        ((typeof indi.refn === 'undefined') ? null : indi.refn),
+        ((typeof indi.note === 'undefined') ? null : indi.note),
+        birth,
+        death,
+        isLiving(birth, death)
+    ];
+
+    if (DEBUG) {
+       console.log(JSON.stringify(indi), null, 2);
+       console.log(JSON.stringify(rec), null, 2);
+    }
+
+    conn.query(sql_indi, rec);
+
+    for (i in indi.fams) {
+        conn.query(sql_fams, [indi.indi, indi.fams[i]]);
+    }
+
+    for (j in indi.even) {
+        var evt = indi.even[j];
+        var rec = [
+            indi.indi,
+            ((typeof evt.etype === 'undefined') ? null : evt.etype),
+            ((typeof evt.date === 'undefined') ? null : evt.date),
+            ((typeof evt.plac === 'undefined') ? null : evt.plac),
+            ((typeof evt.note === 'undefined') ? null : evt.note),
+            ((typeof evt.text === 'undefined') ? null : evt.text),
+            ((typeof evt.edate === 'undefined') ? null : evt.edate)
+        ];
+
+        conn.query(sql_even, rec);
+
+        for (k in indi.even[j].sour) {
+            var s = indi.even[j].sour[k];
+            for (m in s.data) {
+                var rec = [
+                    indi.indi,
+                    s.refid,
+                    s.data[m]
+                ];
+
+                conn.query(sql_stxt, rec);
+            }
+        }
+    }
+}
+
+
+/**
+ * loadFam(conn, item)
+ *
+ * Load an family subtree in item into the database connection.
+ *
+ * param: conn  - an open database connection
+ * param: item  - and family subtree from the parse-gedcom object tree
+ */
+function loadFam(conn, item) {
+
+    if (DEBUG) {
+        console.log("-----------------\n" + JSON.stringify(item, null, 2));
+    }
+
+    if (VERBOSE) {
+        var t = item.tree;
+        for (i in t) {
+            var tag = t[i]['tag'];
+            if (typeof stats[tag] === 'undefined') {
+                stats[tag] = 1;
+            }
+            else {
+                stats[tag] = stats[tag] + 1;
+            }
+        }
+    }
+
+    var sql_fami = 'INSERT INTO fami VALUES (?, ?, ?, ?)';
+    var sql_chil = 'INSERT INTO child (fami, indi) VALUES (?, ?)';
+    var sql_even = 'INSERT INTO events (refid, etype, date, plac, note, text, edate) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    var sql_stxt = 'INSERT INTO sourtxt (refid, sourid, text) VALUES (?, ?, ?)';
+
+    var fami = getFam(item);
+
+    var rec = [
+        fami.fami,
+        ((typeof fami.husb === 'undefined') ? null : fami.husb),
+        ((typeof fami.wife === 'undefined') ? null : fami.wife),
+        ((typeof fami.note === 'undefined') ? null : fami.note)
+    ];
+
+    conn.query(sql_fami, rec);
+
+    for (i in fami.chil) {
+        conn.query(sql_chil, [fami.fami, fami.chil[i]]);
+    }
+
+    for (j in fami.even) {
+        var evt = fami.even[j];
+        var rec = [
+            fami.fami,
+            ((typeof evt.etype === 'undefined') ? null : evt.etype),
+            ((typeof evt.date === 'undefined') ? null : evt.date),
+            ((typeof evt.plac === 'undefined') ? null : evt.plac),
+            ((typeof evt.note === 'undefined') ? null : evt.note),
+            ((typeof evt.text === 'undefined') ? null : evt.text),
+            ((typeof evt.edate === 'undefined') ? null : evt.edate)
+        ];
+
+        conn.query(sql_even, rec);
+
+        for (k in fami.even[j].sour) {
+            var s = fami.even[j].sour[k];
+            for (m in s.data) {
+                var rec = [
+                    fami.fami,
+                    s.refid,
+                    s.data[m]
+                ];
+
+                conn.query(sql_stxt, rec);
+            }
+        }
+    }
+}
+
+
+/**
+ * loadNote(conn, item)
+ *
+ * Parse and load a NOTE subtree in item into the database.
+ *
+ * param: conn  - an open database connection
+ * param: item  - a top level NOTE definition subtree from the parse-gedcom object tree
+ */
+function loadNote(conn, item) {
+    var nid = cleanPointer(item.pointer);
+    var sql_note = 'INSERT INTO notes (note, text) VALUES (?, ?)';
+
+    for (i in item.tree) {
+        conn.query(sql_note, [nid, item.tree[i].data]);
+    }
+}
+
+
+/**
+ *
+ * param: conn  - an open database connection
+ * param: item  - a top level SOUR definition subtree from the parse-gedcom object tree
+ */
+function loadSour(conn, item) {
+    var sid = cleanPointer(item.pointer);
+    var sql_sour = 'INSERT INTO sour VALUES (?, ?, ?, ?, ?)';
+
+    var rec = [sid, null, null, null, []];
+
+    for (i in item.tree) {
+        switch (item.tree[i].tag) {
+            case 'TITL':
+                rec[1] = item.tree[i].data;
+                break;
+            case 'AUTH':
+                rec[2] = item.tree[i].data;
+                break;
+            case 'PUBL':
+                rec[3] = item.tree[i].data;
+                if (item.tree[i].tree.length > 0) {
+                    for (j in item.tree[i].tree) {
+                        if (item.tree[i].tree[j].tag == 'CONC') {
+                            rec[3] += "\n" + item.tree[i].tree[j].data;
+                        }
+                        else {
+                            console.log('WARNING: unknown tag (' + item.tree[i].tree[j].tag + ')');
+                            console.log(JSON.stringify(item, null, 2));
+                        }
+                    }
+                }
+                break;
+            case 'REPO':
+                if (item.tree[i].tree[0].tag == 'NOTE') {
+                    rec[4].push('NOTE: ' + item.tree[i].tree[0].data);
+                }
+                else if (item.tree[i].tree[0].tag == 'CALN') {
+                    rec[4].push('Medium: ' + item.tree[i].tree[0].data);
+                }
+                else {
+                    console.log('WARNING: unknown tag (' + item.tree[i].tree[0].tag + ')');
+                    console.log(JSON.stringify(item, null, 2));
+                }
+                break;
+        }
+    }
+
+    if (rec[4].length > 0) {
+        rec[4] = rec[4].join("\n");
+    }
+    else {
+        rec[4] = null;
+    }
+
+    conn.query(sql_sour, rec);
+}
+
+
+/**
+ * createTables(conn)
+ *
+ * Drop and recreate the database tables on a database connection.
+ *
+ * param: conn  - an open database connection
+ * param: useDB - which database flavor we are using
+ */
+function createTables(conn, useDB) {
+
+    var schema = {
+        indi: [
+            [ 'INDI'       , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'LNAME'      , 'varchar'  , 30 , "" ],
+            [ 'FNAME'      , 'varchar'  , 60 , "" ],
+            [ 'TITLE'      , 'varchar'  , 20 , "" ],
+            [ 'LNAME_MP'   , 'varchar'  ,  4 , "" ],
+            [ 'FAMC'       , 'varchar'  , 10 , "" ],
+            [ 'SEX'        , 'char'     ,  1 , "" ],
+            [ 'REFN'       , 'varchar'  , 20 , "" ],
+            [ 'NOTE'       , 'varchar'  , 10 , "" ],
+            [ 'BDATE'      , 'varchar'  , 10 , "" ],
+            [ 'DDATE'      , 'varchar'  , 10 , "" ],
+            [ 'LIVING'     , 'int'      , '' , "" ],
+            [ "", "", "", "PRIMARY KEY (INDI)" ]
+        ],
+
+        child: [
+            [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'serial'   , '' , "NOT NULL" ],
+            [ 'INDI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ "" , "", "", "PRIMARY KEY (FAMI, SEQ)" ],
+        ],
+
+        fami: [
+            [ 'FAMI'      , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'HUSB'      , 'varchar'  , 10 , "" ],
+            [ 'WIFE'      , 'varchar'  , 10 , "" ],
+            [ 'NOTE'      , 'varchar'  , 10 , "" ],
+            [ "", "", "", "PRIMARY KEY (FAMI)" ]
+        ],
+
+        fams: [
+            [ 'INDI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'serial'   , '' , "NOT NULL" ],
+            [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ "", "", "", "PRIMARY KEY (INDI, SEQ)" ]
+        ],
+
+        notes: [
+            [ 'NOTE'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'serial'   , '' , "NOT NULL" ],
+            [ 'TEXT'  , 'varchar'  , 255 , "" ],
+            [ "", "", "", "PRIMARY KEY (NOTE, SEQ)" ]
+        ],
+
+        sour: [
+            [ 'SOUR'  , 'varchar'  , 10 , 'NOT NULL' ],
+            [ 'TITL'  , 'varchar'  , 255, '' ],
+            [ 'AUTH'  , 'varchar'  , 255, '' ],
+            [ 'PUBL'  , 'varchar'  , 1024, '' ],
+            [ 'REPO'  , 'varchar'  , 255, '' ],
+            [ '', '', '', 'PRIMARY KEY (SOUR)' ]
+        ],
+
+        events: [
+            [ 'REFID' , 'varchar'  , 10, 'NOT NULL' ],  // this can be Innnn or Fnnnn
+            [ 'SEQ'   , 'serial'   , '', 'NOT NULL' ],
+            [ 'ETYPE' , 'varchar'  , 30, 'NOT NULL' ],
+            [ 'DATE'  , 'varchar'  , 255, '' ],
+            [ 'PLAC'  , 'varchar'  , 255, '' ],
+            [ 'NOTE'  , 'varchar'  , 10, '' ],
+            [ 'TEXT'  , 'varchar'  , 255, '' ],
+            [ 'EDATE' , 'varchar'  , 10, '' ],
+            [ '', '', '', 'PRIMARY KEY (REFID, SEQ)' ]
+        ],
+
+        eorder: [
+            [ 'ETYPE' , 'varvhar'  , 30, 'NOT NULL' ],
+            [ 'EORDER', 'int'      , '', '']
+        ],
+
+        sourtxt: [
+            [ 'REFID' , 'varchar', 10, 'NOT NULL' ],    // this can be Innnn or Fnnnn
+            [ 'SEQ',    'serial' , '', 'NOT NULL' ],
+            [ 'SOURID', 'varchar', 10, '' ],    // TODO: this should NOT NULL, but some SOUR records don't have it
+            [ 'TEXT',   'varchar', 255, ''],
+            [ '', '', '', 'PRIMARY KEY (REFID, SEQ)' ]
+        ]
+    };
+
+    var indexes = [
+        "create index indi_idx on child (indi)",
+        "create index wife_idx on fami (wife)",
+        "create index husb_idx on fami (husb)",
+        "create index fami_idx on fams (fami)",
+    ];
+
+    // change schema definitions to be compatible with sqlite3
+
+    if (useDB == 'sqlite3') {
+        schema.child = [
+            [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'integer' ,  '' , "PRIMARY KEY" ],
+            [ 'INDI'  , 'varchar'  , 10 , "NOT NULL" ]
+        ];
+        indexes.push('create index child_idx on child (fami, seq)');
+
+        schema.fams = [
+            [ 'INDI'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'integer'  , '' , "PRIMARY KEY" ],
+            [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ]
+        ];
+        indexes.push('create index fams_idx on fams (indi, seq)');
+
+        schema.notes = [
+            [ 'NOTE'  , 'varchar'  , 10 , "NOT NULL" ],
+            [ 'SEQ'   , 'integer'  , '' , "PRIMARY KEY" ],
+            [ 'TEXT'  , 'varchar'  , 255 , "" ]
+        ];
+        indexes.push('create index notes_idx on notes (note, seq)');
+
+        schema.events = [
+            [ 'REFID' , 'varchar'  , 10, 'NOT NULL' ],  // this can be Innnn or Fnnnn
+            [ 'SEQ'   , 'integer'  , '', 'PRIMARY KEY' ],
+            [ 'ETYPE' , 'varchar'  , 30, 'NOT NULL' ],
+            [ 'DATE'  , 'varchar'  , 255, '' ],
+            [ 'PLAC'  , 'varchar'  , 255, '' ],
+            [ 'NOTE'  , 'varchar'  , 10, '' ],
+            [ 'TEXT'  , 'varchar'  , 255, '' ],
+            [ 'EDATE' , 'varchar'  , 10, '' ]
+        ],
+        indexes.push('create index events_refid_idx on sourtxt (refid, seq)');
+
+        schema.sourtxt = [
+            [ 'REFID' , 'varchar', 10, 'NOT NULL' ],    // this can be Innnn or Fnnnn
+            [ 'SEQ',    'integer', '', ' PRIMARY KEY' ],
+            [ 'SOURID', 'varchar', 10, '' ],    // TODO: this should NOT NULL, but some SOUR records don't have it
+            [ 'TEXT',   'varchar', 255, '']
+        ];
+        indexes.push('create index sourtxt_refid_idx on sourtxt (refid, seq)');
+    }
+
+    if (DEBUG) {
+        console.log(JSON.stringify(schema), null, 2);
+    }
+
+    for (tab in schema) {
+        sql = "drop table if exists " + tab;
+        if (DEBUG || VERBOSE) {
+            console.log(sql);
+        }
+        conn.query(sql);
+
+        table = schema[tab];
+        sql = "create table " + tab + "(";
+        for (i in table) {
+            if (table[i][0] == "" && table[i][1] == "") {
+                sql += table[i][3] + ")";
+                break;
+            }
+            var size = "(" + table[i][2] + ") ";
+            if (table[i][2] == '') {
+                size = ' ';
+            }
+            var comma = (parseInt(i)+1 == table.length) ? ')' : ',';
+            sql += table[i][0] + " " + table[i][1] + size + table[i][3] + comma + "\n";
+        }
+
+        if (DEBUG || VERBOSE) {
+            console.log(sql);
+        }
+        conn.query(sql);
+    }
+
+    for (i in indexes) {
+        if (DEBUG || VERBOSE) {
+            console.log(indexes[i]);
+        }
+        conn.query(indexes[i]);
+    }
+
+    /* load event order table
+     *
+     *  1 - 10 birth
+     * 11 - 20 marriage
+     * 21 - 30 travel
+     * 31 - 40 occupation
+     * 41 - 50 residence
+     * 51 - 90 other
+     * 91 - 98 death
+     *
+    */
+    var eorder = {
+        Address: 41,
+        Adoption: 10,
+        Alias: 57,
+        Annulled: 12,
+        Arrival: 23,
+        Baptism: 2,
+        Birth: 1,
+        Buried: 93,
+        Census: 51,
+        Christening: 2,
+        Conference: 52,
+        Cremation: 92,
+        Death: 91,
+        Departure: 21,
+        Divorced: 14,
+        Emigration: 22,
+        Graduation: 53,
+        Immigration: 24,
+        Marriage: 11,
+        Membership: 54,
+        Military: 32,
+        'None-Ending': 15,
+        Occupation: 31,
+        Ordination: 33,
+        'Other-Begin': 14,
+        Partners: 11,
+        Phone: 43,
+        Probate: 95,
+        Religion: 55,
+        Residence: 42,
+        Separated: 13,
+        'Social Security No.': 56,
+        Will: 94
+    };
+
+    sql = 'insert into eorder values(?,?)';
+
+    for (var key in eorder) {
+        conn.query(sql, [key, eorder[key]]);
+    }
+}
+
+

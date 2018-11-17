@@ -1,0 +1,15 @@
+<table align=center width="98%" border=0 cellpadding=2>
+{{#each sources as |src|}}
+<tr><td>
+<h2>Source for <a href="/{{../dbName}}/indi/{{src.indi}}">{{src.name}}</a> on {{src.stype}}:</h2>
+<ul>
+{{#if src.text}}<li>Text: {{{src.text}}}{{/if}}
+{{#if src.titl}}<li>Title: {{{src.titl}}}{{/if}}
+{{#if src.auth}}<li>Author: {{{src.auth}}}{{/if}}
+{{#if src.publ}}<li>Publication: {{{src.publ}}}{{/if}}
+{{#if src.repo}}<li>Repository: {{{src.repo}}}{{/if}}
+</ul>
+</td></tr>
+{{/each}}
+</table>
+
