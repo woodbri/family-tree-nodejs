@@ -1,0 +1,9 @@
+version: '2'
+services:
+  www:
+    build: .
+    volumes:
+      - './db:/app/db'
+    ports:
+      - '3000:3000'
+

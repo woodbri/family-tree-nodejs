@@ -44,6 +44,23 @@ npm install
 ./start
 ```
 
+### Running with Docker
+
+Alternatively, a `docker-compose.yml` file is provided which will install and
+run the app inside a Docker container, accessible at `http://localhost:3000`.
+
+You will need to have Docker and Docker Compose installed to use this method.
+
+To run in Docker, use the following command:
+
+```
+sudo docker-compose up
+```
+
+This will create a `db` folder that is mounted into the container. Follow the
+configuration instructions below and put your database and configuration in
+that folder.
+
 ## Configuring the Server
 
 The section describes how to load a GEDCOM file and configure the server to use it.
