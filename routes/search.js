@@ -13,7 +13,7 @@ function searchRouter(req, res, next) {
         };
     }
 
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var async = require('async');
     var dbName = req.params.dbName;
     var pool = require('../db-config').createConnection(dbName);
@@ -50,14 +50,14 @@ function searchRouter(req, res, next) {
     if (funcs.length > 0) {
         async.parallel(funcs, function(err, values) {
             pool.close();
-            resData['results'] = data;
-            res.render('search', resData);
+            res.locals['results'] = data;
+            res.render('search');
         });
     }
     else {
         pool.close();
-        resData['results'] = data;
-        res.render('search', resData);
+        res.locals['results'] = data;
+        res.render('search');
     }
 
     function linkName(r) {

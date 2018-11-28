@@ -1,0 +1,136 @@
+<table class=tableback width="99%" border=0 cellspacing=0 cellpadding=1 valign=center align=center><tr><td>
+<table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3><tr>
+  <td class=h1 align=left>Web Photo Manager</td>
+  <td>
+  <table align=right><tr>
+    <form action="/{{dbName}}/media/edit/{{prev_id}}" method="get">
+      <td align=right>
+        <input type="submit" value="PREV">
+      </td>
+    </form>
+    <form action="/{{dbName}}/media/edit/{{next_id}}" method="get">
+      <td align=center>
+        <input type="submit" value="NEXT">
+      </td>
+    </form>
+    <form action="/{{dbName}}/media/edit/" method="get">
+      <td align="center">
+        <input type="input" size="10" maxlength="10" name="id" value="{{next_id}}">
+        <input type="submit" value="GO TO">
+      </td>
+    </form>
+{{#if isAdmin}}
+    <form action="/{{dbName}}/media/delete/{{id}}" method="get">
+      <td align=center>
+        <input type="submit" value="DELETE">
+      </td>
+    </form>
+{{/if}}
+    </tr></table>
+  </tr>
+</table>
+</td></tr></table></td></tr></table>
+<div>&nbsp;</div>
+{{#if query.error}}
+<div style="background-color: red">
+<p>&nbsp;</p>
+<p><center>{{query.error}}</center></p>
+<p>&nbsp;</p>
+</div>
+{{/if}}
+
+<table width="98%" align="center">
+<tr><td>
+{{#if isAdmin}}
+<form action="/{{dbName}}/media/edit/{{id}}" method="post">
+{{/if}}
+<div style="float:left">
+<p>Photo ID:&nbsp;<input type="text" name="id" value="{{id}}" disabled size="10" maxlength="10"></p>
+<p>Photo Description:<br><textarea name="desc" wrap="virtual" rows="10" cols="60">{{photo.desc}}</textarea>
+<p><table border="1" cellspacing="0">
+  <tr>
+    <td>
+      <table border="1" cellspacing="0">
+        <tr>
+          <td align="right">YYYY-MM-DD&nbsp;</td>
+          <td><input type="text" name="date" value="{{photo.date}}"></td>
+        </tr>
+        <tr>
+          <td align="right">Text Date:&nbsp;</td>
+          <td><input type="text" name="tdate" value="{{photo.tdate}}"></td>
+        </tr>
+        <tr>
+          <td align="right">Title:&nbsp;</td>
+          <td><input type="text" name="title" value="{{photo.title}}"></td>
+        </tr>
+        <tr>
+          <td align=right>Group:&nbsp;{{photo.gid}}</td>
+          <td><select name="gid">
+          {{#each pgroups}}
+          <option value="{{this.id}}" {{#compare this.id '==' ../photo.gid}}selected{{/compare}}>{{this.desc}}</option>
+          {{/each}}
+          </select>
+          </td>
+        </tr>
+        <tr>
+          <td align=right>Original file type:&nbsp;</td>
+          <td><input type="text" name="type" {{#if isAdmin}}{{else}}disabled{{/if}} value="{{photo.type}}"></td>
+        </tr>
+      </table>
+    </td>
+    <td align="center">
+      &nbsp;<a href="{{photo.view}}" target="_photo"><img src="{{photo.thumb}}"></a>&nbsp;<br><br>
+      &nbsp;<a href="{{photo.orig}}">Original</a>&nbsp;
+    </td>
+  </tr>
+</table>
+</div>
+<div>
+&nbsp;&nbsp;<img src="{{photo.web}}">
+</div>
+<br style="clear: both">
+{{#if isAdmin}}
+<center><input type="submit" value="Update Photo"></center>
+</form>
+{{/if}}
+
+<p>Individuals associated with photo {{id}}</p>
+
+
+<table cellpadding=0 cellspacing=0 width=95% border=1>
+<tr>
+  <th valign="top" width="10%">INDI</th>
+  <th valign="top" width="50%">NAME</th>
+  <th valign="top" width="30%">DATES</th>
+  <th valign="top" width="10%">DEL</th>
+</tr>
+{{#each photo.indis as |data|}}
+<tr>
+{{#if data.presumed}}
+  <td colspan="4">Presumed living</td>
+{{else}}
+  <td align="center"><a href="/{{../dbName}}/indi/{{data.indi}}" target="_family">{{data.indi}}</a></td>
+  <td>{{data.name}}</td>
+  <td align="center">{{data.dates}}</td>
+  <td align="center">{{#if ../isAdmin}}<a href="/{{../dbName}}/media/link/{{../id}}?del={{data.indi}}">DEL</a>{{else}}&nbsp;{{/if}}</td>
+{{/if}}
+</tr>
+{{/each}}
+{{#if isAdmin}}
+<form action="/{{dbName}}/media/link/{{id}}" method="get">
+<tr>
+  <td colspan="3"><input id="add" type="text" name="add" value="" size="10"></td>
+  <td align=center><input type="submit" value="ADD"></td>
+</tr>
+{{/if}}
+</form>
+</table>
+
+</td></tr></table>
+
+<script type="text/javascript">
+
+var id = document.getElementById('indi');
+id.focus();
+
+</script>

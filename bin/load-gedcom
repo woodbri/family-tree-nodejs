@@ -29,9 +29,11 @@ switch (useDB) {
     case 'sqlite3':
         // npm install any-db-sqlite3 any-db
         anyDB = require('any-db-sqlite3');
-        dbURL = 'sqlite3://test.db?OPEN_CREATE';
-        dbURL = 'sqlite3://test.db?OPEN_READWRITE&OPEN_CREATE';
-        dbURL = 'sqlite3://localhost/test.db';
+        // there is a bug in any-db-sqlite3 where db urls are not parsed correctly
+        // into objects, so we have to use the object form below for sqlite3
+        // dbURL = 'sqlite3://test.db?OPEN_CREATE';
+        // dbURL = 'sqlite3://test.db?OPEN_READWRITE&OPEN_CREATE';
+        // dbURL = 'sqlite3://localhost/test.db';
         dbURL = {
             adapter:  'sqlite3',
             host:     '',
@@ -860,7 +862,7 @@ function createTables(conn, useDB) {
             [ 'REFID' , 'varchar'  , 10, 'NOT NULL' ],  // this can be Innnn or Fnnnn
             [ 'SEQ'   , 'serial'   , '', 'NOT NULL' ],
             [ 'ETYPE' , 'varchar'  , 30, 'NOT NULL' ],
-            [ 'DATE'  , 'varchar'  , 255, '' ],
+            [ 'DATE'  , 'varchar'  , 50, '' ],
             [ 'PLAC'  , 'varchar'  , 255, '' ],
             [ 'NOTE'  , 'varchar'  , 10, '' ],
             [ 'TEXT'  , 'varchar'  , 255, '' ],
@@ -889,9 +891,48 @@ function createTables(conn, useDB) {
         "create index fami_idx on fams (fami)",
     ];
 
+    var photos = {
+        photos: [
+            [ 'id'   , 'serial',  '', 'not null' ],
+            [ 'type' , 'varchar',  6, '' ],
+            [ 'date' , 'varchar', 10, '' ],
+            [ 'tdate', 'varchar', 50, '' ],
+            [ 'title', 'varchar', 50, '' ],
+            [ 'desc' , 'varchar', 1024, '' ],
+            [ 'gid'  , 'integer', '', '' ],
+            [ '', '', '', 'primary key (id)' ]
+        ],
+        indi_photos: [
+            [ 'indi' , 'varchar', 10, 'not null' ],
+            [ 'id'   , 'integer', '', 'not null' ],
+            [ '', '', '', 'primary key (id, indi)' ]
+        ],
+        pgroups: [
+            [ 'id'   , 'serial',  '', 'not null' ],
+            [ 'desc' , 'varchar', 200, 'not null' ],
+            [ '', '', '', 'primary key (id)' ]
+        ]
+    };
+    indexes.push('create index if not exists indi_photos_indi_idx on indi_photos (indi)');
+
     // change schema definitions to be compatible with sqlite3
 
     if (useDB == 'sqlite3') {
+        photos.photos = [
+            [ 'id', 'integer', '', 'primary key'],
+            [ 'type' , 'varchar',  6, '' ],
+            [ 'date' , 'varchar', 10, '' ],
+            [ 'tdate', 'varchar', 50, '' ],
+            [ 'title', 'varchar', 50, '' ],
+            [ 'desc' , 'varchar', 1024, '' ],
+            [ 'gid'  , 'integer', '', '' ]
+        ];
+
+        photos.pgroups = [
+            [ 'id'   , 'integer',  '', 'primary key' ],
+            [ 'desc' , 'varchar', 200, 'not null' ],
+        };
+
         schema.child = [
             [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ],
             [ 'SEQ'   , 'integer' ,  '' , "PRIMARY KEY" ],
@@ -917,7 +958,7 @@ function createTables(conn, useDB) {
             [ 'REFID' , 'varchar'  , 10, 'NOT NULL' ],  // this can be Innnn or Fnnnn
             [ 'SEQ'   , 'integer'  , '', 'PRIMARY KEY' ],
             [ 'ETYPE' , 'varchar'  , 30, 'NOT NULL' ],
-            [ 'DATE'  , 'varchar'  , 255, '' ],
+            [ 'DATE'  , 'varchar'  , 50, '' ],
             [ 'PLAC'  , 'varchar'  , 255, '' ],
             [ 'NOTE'  , 'varchar'  , 10, '' ],
             [ 'TEXT'  , 'varchar'  , 255, '' ],
@@ -947,6 +988,29 @@ function createTables(conn, useDB) {
 
         table = schema[tab];
         sql = "create table " + tab + "(";
+        for (i in table) {
+            if (table[i][0] == "" && table[i][1] == "") {
+                sql += table[i][3] + ")";
+                break;
+            }
+            var size = "(" + table[i][2] + ") ";
+            if (table[i][2] == '') {
+                size = ' ';
+            }
+            var comma = (parseInt(i)+1 == table.length) ? ')' : ',';
+            sql += table[i][0] + " " + table[i][1] + size + table[i][3] + comma + "\n";
+        }
+
+        if (DEBUG || VERBOSE) {
+            console.log(sql);
+        }
+        conn.query(sql);
+    }
+
+    for (tab in photos) {
+
+        table = photos[tab];
+        sql = "create table if not exists " + tab + "(";
         for (i in table) {
             if (table[i][0] == "" && table[i][1] == "") {
                 sql += table[i][3] + ")";

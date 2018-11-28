@@ -1,0 +1,78 @@
+<table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3><tr>
+  <td class=h1 align=left>Web Photo Manager <font color="#FF0000">DELETE</font></td>
+</td></tr></table></td></tr></table>
+<div>&nbsp;</div>
+
+<form action="/{{dbName}}/media/delete/{{id}}" method="post">
+
+<table border="0" cellpadding="4" width="95%">
+  <tr>
+    <td align="center" colspan="2"><font color="#FF0000"><b>Warning: Are you SURE you want to DELETE<br>
+      this Photo and ALL the links to individuals displayed on this page?</b></font>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><input type="reset" value="CANCEL" onClick="history.back();"></td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr><td>
+
+<p>Photo ID:&nbsp;{{id}}
+<p>Photo Description:<br><textarea name="desc" wrap="virtual" rows="10" cols="60">{{photo.desc}}</textarea>
+<p><table border="1">
+  <tr>
+    <td>
+      <table border="1">
+        <tr>
+          <td align="right">YYYY-MM-DD&nbsp;</td>
+          <td>{{photo.date}}</td>
+        </tr>
+        <tr>
+          <td align="right">Text Date:&nbsp;</td>
+          <td>{{photo.tdate}}</td>
+        </tr>
+        <tr>
+          <td align="right">Title:&nbsp;</td>
+          <td>{{photo.title}}</td>
+        </tr>
+        <tr>
+          <td align="right">Group:&nbsp;</td>
+          <td>
+            {{#each pgroups}}
+            {{#compare this.id '==' ../photo.gid}}{{this.desc}}{{/compare}}
+            {{/each}}
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td>
+      &nbsp;<a href={{photo.web}} target="_photo"><img src={{photo.thumb}}></a>
+    </td>
+  </tr>
+</table>
+</td>
+<td align="left">
+<img src="{{photo.web}}">
+</td></tr>
+</table>
+
+<p>Individuals associated with photo {{id}}</p>
+
+<table cellpadding="0" cellspacing="0" width="95%" border="1">
+<tr>
+  <th valign="top" width="10%">INDI</th>
+  <th valign="top" width="80%">NAME</th>
+  <th valign="top" width="80%">DATES</th>
+</tr>
+{{#each photo.indis as |data|}}
+<tr>
+  <td align="center"><a href="/{{../dbName}}/indi/{{data.indi}}" target="_family">{{data.indi}}</a></td>
+  <td>{{data.name}}</td>
+  <td>{{data.dates}}</td>
+</tr>
+{{/each}}
+</table>
+<br>
+<center><input type="submit" value="Permanently DELETE ALL these records">
+</form>
+</center>

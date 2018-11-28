@@ -65,8 +65,9 @@ function birthdayRouter(req, res, next) {
             });
 
             resData['rows'] = rows;
+            res.locals = resData;
             pool.release(conn);
-            res.render('birthdays', resData);
+            res.render('birthdays');
         });
     });
 

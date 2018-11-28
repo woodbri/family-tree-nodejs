@@ -1,0 +1,24 @@
+<table align="center" width="98%" border="0" cellpadding="2"><tr><td>
+
+<h2>{{header}}</h2>
+
+<table cellpadding="2" cellspacing="0">
+<tr>
+<th>Indi Id</th>
+<th>Name</th>
+<th>Dates</th>
+<th>Photo Count</th>
+</tr>
+{{#each rows}}
+<tr>
+<td valign="top">{{this.indi}}</td>
+<td valign="top"><a href="/{{../dbName}}/indi/{{this.indi}}">{{this.name}}</a></td>
+<td valign="top">{{this.dates}}</td>
+<td valign="top" align="center"><a href="/{{../dbName}}/media/list/indi/{{this.indi}}">{{this.photo_cnt}}</a></td>
+</tr>
+{{/each }}
+
+</table>
+
+</td></tr>
+</table>

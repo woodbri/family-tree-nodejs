@@ -11,20 +11,28 @@ Collaboration and/or pull requests are welcome.
 
 ### Package Dependencies
 
+See the package.json file for up to date list and versions.
+
 * any-db
+* any-db-pool
+* any-db-sqlite3
 * async
 * cookie-parser
+* debug
 * express
 * express-handlebars
 * express-session
+* formidable
+* glob-fs
 * fs
+* hbs
 * http-errors
 * metaphone
 * morgan
 * node-htmlencode
 * nodemailer
-* nodemailer-mailgun-transport
 * path
+* sharp
 
 ### Download and Install
 
@@ -39,10 +47,10 @@ npm install
 ## Configuring the Server
 
 The section describes how to load a GEDCOM file and configure the server to use it.
-The development and testing has been based on using Sqlite databases are quick and
+The development and testing has been based on using Sqlite databases that are quick and
 easy to work with and minimize the configuration dependencies and setup. Most page
 requests are served in under 200 ms, but this is obviously based on system performance
-and load, so your mileage myay vary.
+and load, so your mileage may vary.
 
 The system supports multiple databases and each can be configured independently of
 the other.
@@ -65,14 +73,26 @@ cp sample-db.cfg db/mygedcom/mygedcom.cfg
 cp sample-db.about db/mygedcom/mygedcom.about
 ```
 
+### Integrating Photos with your Genealogy Data
+
+This code currently does not support GEDCOM 5.5 support for media links. This could be
+added in the future. For now there is a photo management system included if you turn it
+in ``db-config.js`` by setting ``hasPhotos: true``. This enable a ``Photos`` link on the
+main menu bar. From here you users logged in with admin rights can upload photos, link
+them to individuals, view them and edit attributes associated with the photos.
+
 ### Configuring Databases in the Server
 
 In the db-config.js file edit the databases section so it has your database(s) defined.
 In the example below there are two databases configured 'woodbridge' and
 'woodbridge\_record'. Leave the 'adapter' set to 'sqlite3', in the future this might
 also allow using 'mysql' and/or 'postgresql' databases. Edit the 'database' variable
-to point your database as installed above. And leave "read\_only" set to "1" since
-we don't need to write to the database.
+to point your database as installed above.
+
+Version 0.1.0+ has support for integrating photos with you genealogy. If you use this
+DO NOT renumber your indiviual ID in your genealogy program as these are used to link
+to photos. In the ``db-config.js`` file set option ``hasPhotos: true`` if you plan to
+use the photo management option or ``hasPhotos: false`` if not.
 
 ```
 var databases = {
@@ -83,7 +103,8 @@ var databases = {
         title: 'Woodbridge Family Tree',
         owner: 'Stephen Woodbridge',
         email: 'stephenwoodbridge37 (at) gmail (dot) com',
-        copyright: "Family Data Copyright 2001-2018 by Stephen Woodbridge, All Rights Reservered."
+        copyright: "Family Data Copyright 2001-2018 by Stephen Woodbridge, All Rights Reservered.",
+        hasPhotos: true
     },
     woodbridge_record: {
         adapter: 'sqlite3',
@@ -92,7 +113,8 @@ var databases = {
         title: 'Woodbridge Family Tree',
         owner: 'Stephen Woodbridge',
         email: 'stephenwoodbridge37 (at) gmail (dot) com',
-        copyright: "Family Data Copyright 2001-2018 by Stephen Woodbridge, All Rights Reservered."
+        copyright: "Family Data Copyright 2001-2018 by Stephen Woodbridge, All Rights Reservered.",
+        hasPhotos false
     }
 };
 ```
@@ -112,7 +134,8 @@ has logged into the system. Logged in users can see everything.
 
 Users are configured with static logins configured in the db/&lt;dbname&gt;/&lt;dbname&gt;.cfg file
 in the database directory. the sample-db.cfg you copied has a default user "test" with a password "test", CHANGE THIS!, in the auth section of that file. The admin flag is
-not currently being used but might allow an admin user to make changes in the future.
+required if you want to allow this user to upload, edit and manage photos associated with
+your family tree.
 
 
 ```
@@ -126,17 +149,17 @@ var dbConfig = {
 
 ### Setting up email for Feedback
 
-I added basic feedback via email and mad a test using mailgun, but there are other
+I added basic feedback via email and made a test using mailgun, but there are other
 transports available including talking to an smtp server. Read up on nodemailer for
 configuration details. You will likely need to make changes to routes/feedbackpost.js
 that handles sending the email.
 
 You can configure mailers in the "mailers" section and then reference that in the code.
-the "options" section, sets up the basic email envelope and the dumby options.text is
+the "options" section, sets up the basic email envelope and the dummy options.text is
 where the email body text will replace based on the form contents.
 
 You can configure "requireLoginForFeedback" to true or false to only allow logged in
-user the ability to send you feedback or to allow all users to send feedback.
+users the ability to send you feedback or to allow all users to send feedback.
 
 ```
 var dbConfig = {
@@ -164,6 +187,10 @@ var dbConfig = {
 
 ## File Structure
 
+The sqlite databases are stored in ``./db/&lt;DBName&gt;/`` along with its cfg and about
+files. If you are using the Photo management options the photos are stored in
+``./media/&lt;DBName&gt;/`` and photo attributes are stored in the respective database.
+
 ```
 ./app.js
 ./bin/load-gedcom
@@ -175,6 +202,8 @@ var dbConfig = {
 ./db/woodbridge_record/woodbridge_record.cfg
 ./db/woodbridge_record/woodbridge_record.db
 ./db-config.js
+./LICENSE
+./media/README.md
 ./package.json
 ./package-lock.json
 ./public/images/favicon.ico
@@ -188,10 +217,22 @@ var dbConfig = {
 ./routes/descendants.js
 ./routes/feedback.js
 ./routes/feedbackpost.js
+./routes/getgroups.js
 ./routes/help.js
 ./routes/home.js
 ./routes/index.js
 ./routes/indi.js
+./routes/mediadelete.js
+./routes/mediadeletepost.js
+./routes/mediaedit.js
+./routes/mediaeditpost.js
+./routes/mediagroupspost.js
+./routes/mediaimage.js
+./routes/medialink.js
+./routes/medialist.js
+./routes/mediasummary.js
+./routes/mediaupload.js
+./routes/mediauploadpost.js
 ./routes/names.js
 ./routes/notes.js
 ./routes/search.js
@@ -199,6 +240,9 @@ var dbConfig = {
 ./routes/surnames.js
 ./sample-db.about
 ./sample-db.cfg
+./schema.txt
+./schema-photos.txt
+./start
 ./utils.js
 ./views/about.hbs
 ./views/birthdays.hbs
@@ -211,6 +255,14 @@ var dbConfig = {
 ./views/indi.hbs
 ./views/layouts/layout.hbs
 ./views/login.hbs
+./views/mediadelete.hbs
+./views/mediaedit.hbs
+./views/medialist1.hbs
+./views/medialist2.hbs
+./views/medialist3.hbs
+./views/mediasummary.hbs
+./views/mediaupload.hbs
+./views/mediaview.hbs
 ./views/names.hbs
 ./views/notes.hbs
 ./views/partials/footer.hbs

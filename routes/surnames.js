@@ -3,7 +3,7 @@ var getHeaderInfo = require('../utils');
 /* GET Surnames listing. */
 function surnamesRouter(req, res, next) {
 
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
 
     var dbName = req.params.dbName;
     var pool = require('../db-config').createConnection(dbName);
@@ -83,9 +83,9 @@ function surnamesRouter(req, res, next) {
             //console.log(JSON.stringify(tables, null, 2));
 
             pool.release(conn);
-            resData['tables'] = tables;
-            resData['unknown'] = unknown;
-            res.render('surnames', resData);
+            res.locals['tables'] = tables;
+            res.locals['unknown'] = unknown;
+            res.render('surnames');
         });
     });
 

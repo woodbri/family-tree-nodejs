@@ -3,7 +3,7 @@ var getHeaderInfo = require('../utils');
 
 /* GET a source listing. */
 function sourceRouter(req, res, next) {
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var sourceId = req.params.id;
     var pool = require('../db-config').createConnection(dbName);
@@ -45,8 +45,8 @@ function sourceRouter(req, res, next) {
             });
 
             pool.release(conn);
-            resData['sources'] = sources;
-            res.render('source', resData);
+            res.locals['sources'] = sources;
+            res.render('source');
         });
         pool.close();
     });

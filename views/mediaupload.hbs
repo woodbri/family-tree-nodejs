@@ -1,0 +1,64 @@
+<table align="center" width="98%" border="0" cellpadding="2"><tr><td>
+<h2>Media Upload</h2>
+
+<p>Select a image you want to upload. This should be PNG, JPG, TIF or similar image file. If you know the indiID(s) of the people in the image you can enter them in a comma or blank separated list or leave the field blank and link them later.</p>
+<p>Description of fields:
+<ul>
+<li>Image Date - An approximate date that can be represented as a date.
+<li>Textual Date - A textual date like 'Circa 1945' or 'Bef. Jan 20, 1930'.
+<li>Short Title - A short title that will get displayed with images.
+<li>Description - A detailed description of the image, like a list of peoples names.
+<li>Indi IDs - A list of Indi IDs of people in the image. Optional, and can be added later.
+</ul>
+</p>
+
+{{#if error}}
+<div style="background-color: red">
+<p><br><center>{{error}}</center></br></p>
+</div>
+{{/if}}
+
+<form method="post" enctype="multipart/form-data">
+<table border="0">
+<tr>
+<td align="right">Select image to upload:</td>
+<td><input type="file" name="uploadfile" accept="image/jpeg,image/png,image/tiff, image/gif, image/svg+xml"></td>
+</tr>
+<tr>
+<td align="right">Image Date (YYYY[-MM[-DD]]):</td>
+<td><input type="text" name="date" maxlength="10"></td>
+</tr>
+<tr>
+<td align="right">Textual Date:</td>
+<td><input type="text" name="tdate" size="50" maxlength="50"></td>
+</tr>
+<tr>
+<td align="right">Short title:</td>
+<td><input type="text" name="title" size="50" maxlength="50"></td>
+</tr>
+<tr>
+<td valign="top" align="right">Group:</td>
+<td><select name="gid">
+{{#each pgroups}}
+<option value="{{this.id}}">{{this.desc}}</option>
+{{/each}}
+</select>
+</td>
+</tr>
+<tr>
+<td valign="top" align="right">Description:</td>
+<td><textarea name="desc" cols="50" rows="6" maxlength="1024" wrap="hard"></textarea></td>
+</tr>
+<tr>
+<td>Optional list of Indi IDs:</td>
+<td><input type="text" name="indilist" size="50" value="{{#if indi}}{{indi}}{{/if}}"></td>
+</tr>
+<tr>
+<td colspan="2" align="center"><input type="submit" value="Upload"></td>
+</tr>
+</table>
+</form>
+
+
+</td></tr>
+</table>

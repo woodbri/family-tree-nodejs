@@ -19,7 +19,19 @@ var sourceRouter = require('./routes/source');
 var searchRouter = require('./routes/search');
 var feedbackRouter = require('./routes/feedback');
 var feedbackPostRouter = require('./routes/feedbackpost');
-// TODO add photolistRouter and photoRouter
+// photo management routers
+var mediaUploadRouter = require('./routes/mediaupload');
+var mediaUploadPostRouter = require('./routes/mediauploadpost');
+var mediaImageRouter = require('./routes/mediaimage');
+var mediaListRouter = require('./routes/medialist');
+var mediaLinkRouter = require('./routes/medialink');
+var mediaEditRouter = require('./routes/mediaedit');
+var mediaEditPostRouter = require('./routes/mediaeditpost');
+var mediaDeleteRouter = require('./routes/mediadelete');
+var mediaDeletePostRouter = require('./routes/mediadeletepost');
+var mediaSummaryRouter = require('./routes/mediasummary');
+var mediaGroupsPostRouter = require('./routes/mediagroupspost');
+var getGroupsRouter = require('./routes/getgroups');
 
 var app = express();
 var session = require('express-session');
@@ -44,6 +56,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/:dbName/image/:mode/:file', mediaImageRouter)
 app.use('/:dbName/home', homeRouter);
 app.use('/:dbName/about', aboutRouter);
 app.use('/:dbName/help', helpRouter);
@@ -57,7 +70,19 @@ app.use('/:dbName/source/:id', sourceRouter);
 app.use('/:dbName/search', searchRouter);
 app.get('/:dbName/feedback', feedbackRouter);
 app.post('/:dbName/feedback', feedbackPostRouter);
-// TODO add photolistRouter and photoRouter
+// photo management routes
+app.get('/:dbName/media/upload', getGroupsRouter, mediaUploadRouter);
+app.post('/:dbName/media/upload', mediaUploadPostRouter);
+app.use('/:dbName/media/list/:mode/:id*?', mediaListRouter);
+app.use('/:dbName/media/link/:id', mediaLinkRouter);
+app.get('/:dbName/media/edit/:id', getGroupsRouter, mediaEditRouter);
+app.get('/:dbName/media/view/:id', getGroupsRouter, mediaEditRouter);
+app.post('/:dbName/media/edit/:id', mediaEditPostRouter);
+app.get('/:dbName/media/delete/:id', getGroupsRouter, mediaDeleteRouter);
+app.post('/:dbName/media/delete/:id', mediaDeletePostRouter);
+app.get('/:dbName/media/summary', mediaSummaryRouter);
+app.post('/:dbName/media/groups', mediaGroupsPostRouter, getGroupsRouter);
+
 app.get('/:dbName/login', function(req, res) {
     var getHeaderInfo = require('./utils');
     var resData = getHeaderInfo(req);

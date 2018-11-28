@@ -14,8 +14,8 @@ function feedbackPostRouter(req, res) {
             resData['femail'] = req.body.femail;
             resData['fcomments'] = req.body.fcomments;
             resData['errors'] = 'All fields are required to have valid data';
-            console.error('Errors in feedback form!');
-            res.render('feedback', resData);
+            res.locals = resData;
+            res.render('feedback');
             return;
         }
         const nodemailer = require('nodemailer');

@@ -1,0 +1,45 @@
+<table class="tableback" width="99%" border="0" cellspacing="0" cellpadding="1" align="center">
+<tr><td>
+  <table class="tablelite" width="100%" border="0" cellspacing="0" cellpadding="3"><tr>
+    <td align="left"><b>Photo ID: {{id}}</b></td>
+    <form>
+      <td align="right">
+        <input type="submit" value="Done" onClick="window.close()">
+      </td>
+    </form>
+  </tr>
+  </table>
+</td></tr>
+</table>
+
+<div>&nbsp;</div>
+
+<table align="center" border="0">
+  <tr><td align="center"><img src="{{photo.web}}"></td></tr>
+  <tr><td align="center">{{photo.tdate}}</td></tr>
+  <tr><td align="center">{{photo.title}}</td></tr>
+  <tr><td align="center"><p>{{photo.desc}}</p>&nbsp;</td></tr>
+  <tr>
+    <td align="center">
+      <table border="1" cellspacing="0" cellpadding="2">
+        <tr>
+          <th>INDI</th>
+          <th>NAME</th>
+          <th>DATES</th>
+        </tr>
+{{#each photo.indis as |data|}}
+        <tr>
+{{#if presumed}}
+          <td colspan="3">Presumed Living</td>
+{{else}}
+          <td><a href="/{{../dbName}}/indi/{{data.indi}}" target="_family">{{data.indi}}</a></td>
+          <td>{{data.name}}</td>
+          <td>{{data.dates}}</td>
+{{/if}}
+        </tr>
+{{/each}}
+       </table>
+    </td>
+  </tr>
+</table>
+

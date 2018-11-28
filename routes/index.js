@@ -4,7 +4,7 @@ var getHeaderInfo = require('../utils');
 
 /* GET home page. */
 function indexRouter(req, res, next) {
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var list = [];
     for (var dbname in dbs) {
         list.push({
@@ -14,9 +14,9 @@ function indexRouter(req, res, next) {
             email: dbs[dbname].params.email
         });
     }
-    resData['dbs'] = list;
-    resData['title'] = 'Genealogy Web Server';
-    res.render('index', resData);
+    res.locals['dbs'] = list;
+    res.locals['title'] = 'Genealogy Web Server';
+    res.render('index');
 };
 
 module.exports = indexRouter;

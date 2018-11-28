@@ -1,0 +1,23 @@
+<table align=center width="98%" border=0 cellpadding=2>
+<tr><td>
+
+<h2>Images for <a href="/{{dbName}}/indi/{{indi.indi}}">{{indi.name}}</a> {{indi.dates}}</h2>
+
+<table width="100%" cols="5">
+{{#each rows as |row|}}
+<tr>
+    {{#each row as |cell|}}
+    <td width="20%" align="center" valign="top">
+<a href="{{cell.web}}" target="_photo"><img src="{{cell.thumb}}"></a><br>
+{{cell.title}}<br>
+{{cell.tdate}}{{#if ../../addDesc}}<br>
+{{cell.desc}}{{/if}}
+    </td>
+    {{/each}}
+</tr>
+{{/each}}
+
+</table>
+
+</td></tr>
+</table>

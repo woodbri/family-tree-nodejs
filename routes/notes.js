@@ -3,7 +3,7 @@ var getHeaderInfo = require('../utils');
 
 /* GET notes or source listing. */
 function notesRouter(req, res, next) {
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var items = req.params.id.split('_');
     var noteId = items[0];
@@ -33,16 +33,16 @@ function notesRouter(req, res, next) {
             var name = notes.shift();
             var tmp = name.split('|');
             if (!parseInt(tmp[1]) || (req.session && req.session.user)) {
-                resData['notes'] = notes;
-                resData['indi'] = indi;
-                resData['name'] = tmp[0];
+                res.locals['notes'] = notes;
+                res.locals['indi'] = indi;
+                res.locals['name'] = tmp[0];
             }
             else {
-                resData['notes'] =[];
-                resData['indi'] = '0';
-                resData['name'] = 'Presumed Living';
+                res.locals['notes'] =[];
+                res.locals['indi'] = '0';
+                res.locals['name'] = 'Presumed Living';
             }
-            res.render('notes', resData);
+            res.render('notes');
         });
         pool.close();
     });

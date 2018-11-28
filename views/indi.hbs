@@ -2,7 +2,9 @@
 <h2>Presumed Living</h2>
 {{else}}
 {{#with indi}}
-<table align=center width="98%" border=0 cellpadding=2><tr><td>
+<table align="center" width="98%" border="0" cellpadding="2">
+<tr>
+<td valign="top" width="75%">
 <h2>{{lname}}, {{fname}}</h2>
 <p>
 {{#if note}}
@@ -57,25 +59,41 @@
  {{/each}}
  </td>
  {{#if photos}}
- <!-- photos here -->
- {{#each photos as |row|}}
  <td valign=top width="25%">
- <table align=center cellspacing=3 cols=3><tr>
- <td colspan=3 align=center>Click images to enlarge</td></tr><tr>
+ <table align=center cellspacing="3" cols="3">
+ <tr>
+ <td colspan=3 align=center>Click images to enlarge</td>
+ </tr>
+ {{#each photos as |row|}}
+ <tr>
  {{#each row as |cell|}}
- <td align=center valign=top><a href="/{{../../dbName}}/photo/{{cell.pid}}" target=_photos><img src="{{pimage}}" height="{{hgt}}" width="{{wid}}"></a></td>
+ <td align=center valign=top><a href="{{cell.web}}" target=_photos><img src="{{cell.thumb}}"></a></td>
  {{/each}}
- </tr><tr>
+ </tr>
+ <tr>
  {{/each}}
  {{#if morephotos}}
- </tr><tr><td align=center colspan=3>
- <a href="/{{dbName}}/photoslist/{{indi}}" target=_photosr> View all {{morephotos}} photos</a></td></tr>
+ </tr>
+ <tr><td align=center colspan=3>
+ <a href="/{{../dbName}}/media/list/indi/{{indi}}" target="_photosr"> View all {{morephotos}} photos</a></td>
+ </tr>
+ {{/if}}
+ {{#if ../isAdmin}}
+ <tr><td align=center colspan=3>
+ <a href="/{{../dbName}}/media/upload?indi={{indi}}">Upload New Photo</a>
+ </td> </tr>
  {{/if}}
  </table>
 
  </td></tr>
  </table>
  </td>
+ {{else}}
+ {{#if ../isAdmin}}
+ <td valign="top" align="center" width="25%">
+ <a href="/{{../dbName}}/media/upload?indi={{indi}}">Upload New Photo</a>
+ </td>
+ {{/if}}
  {{/if}}
 
  </tr>

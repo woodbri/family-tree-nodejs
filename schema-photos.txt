@@ -1,0 +1,26 @@
+drop table if exists photos;
+create table photos (
+    id integer primary key,
+    type varchar(6) not null,
+    date varchar(10),
+    tdate varchar(50),
+    title varchar(50),
+    desc varchar(1024),
+    gid integer
+);
+
+drop table if exists indi_photos;
+create table indi_photos (
+    indi varchar(10) not null,
+    id integer not null,
+    primary key (id, indi)
+);
+
+drop table if exists pgroups;
+create table pgroups (
+    id integer primary key,
+    desc varchar(200)
+);
+
+create index if not exists imageindi_indi_idx on imageindi (indi, id);
+

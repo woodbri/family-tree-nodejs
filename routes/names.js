@@ -6,7 +6,7 @@ var async = require('async');
 
 function namesRouter(req, res, next) {
 
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var pool = require('../db-config').createConnection(dbName);
     var useDB = pool.adapter;
@@ -90,15 +90,15 @@ function namesRouter(req, res, next) {
                 },
                 function(err) {
                     if (err) console.error(err);
-                    resData['rows'] = rows;
+                    res.locals['rows'] = rows;
                     pool.release(conn);
-                    res.render('names', resData);
+                    res.render('names');
                 });
             }
             else {
-                resData['rows'] = rows;
+                res.locals['rows'] = rows;
                 pool.release(conn);
-                res.render('names', resData);
+                res.render('names');
             }
         });
         pool.close();

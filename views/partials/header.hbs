@@ -50,6 +50,10 @@
     &nbsp;&nbsp;|&nbsp;&nbsp;
     <a href="/{{dbName}}/birthdays?year=all" title="List people by their birthdays">Birthdays</a>
     &nbsp;&nbsp;|&nbsp;&nbsp;
+    {{#if hasPhotos}}
+    <a href="/{{dbName}}/media/summary" title="Summary of photos loaded">Photos</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    {{/if}}
     {{#if feedbackOK}}
     <a href="/{{dbName}}/feedback?ref={{{current_url}}}" title="Leave database owner comments and suggestions">Feedback</a>
     {{else}}

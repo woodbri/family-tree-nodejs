@@ -211,15 +211,17 @@ function descendantsRouter(req, res, next) {
 
                     resData['line'] = text;
                     resData['name'] = pageName;
+                    res.locals = resData;
                     pool.release(conn);
-                    res.render('descendants', resData);
+                    res.render('descendants');
                 });
             }
             else {
                 resData['line'] = text;
                 resData['name'] = pageName;
+                res.locals = resData;
                 pool.release(conn);
-                res.render('descendants', resData);
+                res.render('descendants');
             }
         });
         pool.close();

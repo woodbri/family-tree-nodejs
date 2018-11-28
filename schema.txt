@@ -46,7 +46,7 @@ CREATE TABLE events(
     REFID varchar(10) NOT NULL,
     SEQ integer PRIMARY KEY,
     ETYPE varchar(30) NOT NULL,
-    DATE varchar(255),
+    DATE varchar(50),
     PLAC varchar(255),
     NOTE varchar(10),
     TEXT varchar(255));

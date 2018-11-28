@@ -4,7 +4,7 @@ var getHeaderInfo = require('../utils');
 /* GET indi listing. */
 function indiRouter(req, res, next) {
 
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
 
     var async = require('async');
     var dbName = req.params.dbName;
@@ -39,8 +39,9 @@ function indiRouter(req, res, next) {
     function(err, values) {
         //console.log(JSON.stringify(indiRes, null, 2));
         pool.close();
-        resData['indi'] = indiRes;
-        res.render('indi', resData);
+        //resData['indi'] = indiRes;
+        res.locals['indi'] = indiRes;
+        res.render('indi');
     });
 
     function getIndi(next) {
@@ -65,7 +66,7 @@ function indiRouter(req, res, next) {
                     indiRes.stats.push({name: 'refn', data: r.REFN});
                     indiRes.stats.push({name: 'sex', data: r.SEX});
                     indiRes['note'] = r.NOTE;
-                    resData['presumed'] = r.LIVING && !(req.session && req.session.user);
+                    res.locals['presumed'] = r.LIVING && !(req.session && req.session.user);
                 }
                 else {
                     console.error('Invalid indi ID');
@@ -295,7 +296,43 @@ function indiRouter(req, res, next) {
 
     function getPhotos(next) {
         //console.log('getPhotos');
-        next(null, 6);
+        pool.acquire(function(err, conn) {
+            if (err) {
+                console.error(err);
+                next(err);
+            }
+
+            var sql = 'select id from indi_photos where indi=? order by random()';
+            conn.query(sql, [indi], function(err, results) {
+                if (err) {
+                    console.error(err);
+                    next(err);
+                }
+
+                var cells = [];
+                var rows = [];
+                var cnt = 0;
+                results.rows.some(function(r) {
+                    cells.push({
+                        thumb: '/' + dbName + '/image/thumb/' + String(r.id).padStart(4, '0') + '.jpg',
+                        web: '/' + dbName + '/media/view/' + r.id
+                    });
+                    cnt++;
+                    if (cnt % 3 == 0) {
+                        rows.push(cells);
+                        cells = [];
+                    }
+                    return cnt > 26;
+                });
+                if (cells.length > 0) {
+                    rows.push(cells);
+                }
+                indiRes.photos = rows;
+                indiRes.morephotos = results.rowCount;
+                pool.release(conn);
+                next(null, 6);
+            });
+        });
     }
 
     function getPedigree(next) {

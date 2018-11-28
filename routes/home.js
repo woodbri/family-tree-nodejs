@@ -4,7 +4,7 @@ var getHeaderInfo = require('../utils');
 
 /* GET About */
 function homeRouter(req, res, next) {
-    var resData = getHeaderInfo(req);
+    res.locals = getHeaderInfo(req) || {};
     var temp = path.join(__dirname, '..', 'db', req.params.dbName, req.params.dbName + '.about');
     fs.readFile(temp, function(err, data) {
         if (err) {
@@ -12,8 +12,8 @@ function homeRouter(req, res, next) {
             return;
         }
 
-        resData['content'] = data;
-        res.render('home', resData);
+        res.locals['content'] = data;
+        res.render('home');
     });
 };
 
