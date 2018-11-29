@@ -5,15 +5,19 @@ function mediaImageRouter(req, res, next) {
     var mode = req.params.mode;
     var file = req.params.file;
     var dbs = require('../db-config.js');
-    if (! dbName || ! dbs.databases['dbName'] ||
+    if (! dbName || ! dbs.databases[dbName] ||
         ! mode || ! mode.match(/^(orig|web|thumb)$/) ||
         ! file || ! file.match(/\.(jpg|tif|gif|png)$/)) {
         res.sendStatus(404);
     }
-    var filename =  __dirname + '/media/' + dbName + '/' + mode + '/' + file;
+    var filename =  './media/' + dbName + '/' + mode + '/' + file;
     fs.access(filename, fs.constants.R_OK, (err) => {
-        if (! err) {
-            res.sendFile(filename, {}, (err) => {});
+        if (err) {
+            console.error(err);
+            next(err);
+        }
+        else {
+            res.sendFile(filename, {root: __dirname + '/../'}, (err) => {});
         }
     });
 }

@@ -322,7 +322,7 @@ function indiRouter(req, res, next) {
                         rows.push(cells);
                         cells = [];
                     }
-                    return cnt > 26;
+                    return cnt > 14;
                 });
                 if (cells.length > 0) {
                     rows.push(cells);
