@@ -1,4 +1,5 @@
-db
+db/woodbridge
+db/woodbridge_record
 data
 node_modules
 test-query
