@@ -102,7 +102,7 @@ function mediaEditRouter(req, res, next) {
                     var orig;
                     if (fileext[r.type]) {
                         orig = '/' + dbName + '/image/orig/' + String(r.id).padStart(4,'0') +
-                            '.' + fileext[r.type];
+                            fileext[r.type];
                     }
                     rows.push({
                         id: r.id,
