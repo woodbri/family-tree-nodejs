@@ -74,7 +74,7 @@
     <td colspan="2">
     <h2>Photo Groups</h2>
     <table cellspacing="0" cellpadding="3" border="1">
-    <tr><th>ID</th><th>Group Name</th><th>DEL</th><th>UPD</th><th>LIST</th></tr>
+    <tr><th>ID</th><th>Group Name</th><th>Count</th><th>DEL</th><th>UPD</th><th>LIST</th></tr>
     {{#each pgroups}}
     <tr>
       {{#if ../isAdmin}}
@@ -82,6 +82,7 @@
       <input type="hidden" name="id" value="{{this.id}}">
       <td align="right">{{this.id}}</td>
       <td><input type="text" size="100" maxlength="200" name="desc" value="{{this.desc}}"></td>
+      <td align="right">{{this.cnt}}</td>
       <td><input type="submit" name="action" value="DEL"></td>
       <td><input type="submit" name="action" value="UPD"></td>
       <td><a href="/{{../dbName}}/media/list/group/{{this.id}}">LIST</a></td>
@@ -89,6 +90,7 @@
       {{else}}
       <td align="right">{{this.id}}</td>
       <td><input type="text" size="100" disabled maxlength="200" name="desc" value="{{this.desc}}"></td>
+      <td align="right">{{this.cnt}}</td>
       <td>&nbsp;</td>
       <td>&nbsp;</td>
       <td><a href="/{{../dbName}}/media/list/group/{{this.id}}">LIST</a></td>
@@ -100,6 +102,7 @@
       <form action="/{{dbName}}/media/groups" method="post">
       <td>&nbsp;</td>
       <td><input type="text" size="100" maxlength="200" name="desc" value=""></td>
+      <td>&nbsp;</td>
       <td colspan="3" align="center"><input type="submit" name="action" value="ADD"></td>
       </form>
     </tr>

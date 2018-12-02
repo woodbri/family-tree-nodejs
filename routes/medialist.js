@@ -35,14 +35,16 @@ function mediaListRouter(req, res, next) {
                         next(err);
                     }
 
-                    results.rows.forEach(function(r) {
-                        indis.push({
-                            indi: r.INDI,
-                            name: r.LNAME + ', ' + r.FNAME,
-                            presumed: r.LIVING && ! isLogin,
-                            dates: r.dates
+                    if (results && results.rowCount > 0) {
+                        results.rows.forEach(function(r) {
+                            indis.push({
+                                indi: r.INDI,
+                                name: r.LNAME + ', ' + r.FNAME,
+                                presumed: r.LIVING && ! isLogin,
+                                dates: r.dates
+                            });
                         });
-                    });
+                    }
 
                     rows[0].indis = indis;
                     pool.release(conn2);
@@ -87,7 +89,7 @@ function mediaListRouter(req, res, next) {
                     ` + where + `
                     group by a.id, tdate, title, desc, gid
                     ` + having + `
-                    order by date, a.id`;
+                    order by a.date, a.id`;
 
                 conn.query(sql, params, function(err, results) {
                     if (err) {
@@ -95,20 +97,22 @@ function mediaListRouter(req, res, next) {
                         next(err);
                     }
 
-                    results.rows.forEach(function(r) {
-                        rows.push({
-                            id: r.id,
-                            tdate: r.tdate,
-                            title: r.title,
-                            thumb: '/' + dbName + '/image/thumb/' +
-                                String(r.id).padStart(4,'0') + '.jpg',
-                            web: '/' + dbName + '/image/web/' +
-                                String(r.id).padStart(4,'0') + '.jpg',
-                            desc: r.desc,
-                            gid: r.gid,
-                            indi_cnt: r.indi_cnt
+                    if (results && results.rowCount > 0) {
+                        results.rows.forEach(function(r) {
+                            rows.push({
+                                id: r.id,
+                                tdate: r.tdate,
+                                title: r.title,
+                                thumb: '/' + dbName + '/image/thumb/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
+                                web: '/' + dbName + '/image/web/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
+                                desc: r.desc,
+                                gid: r.gid,
+                                indi_cnt: r.indi_cnt
+                            });
                         });
-                    });
+                    }
                     res.locals['rows'] = rows;
                     res.locals['header'] = 'List of ' + (id == 'unlinked' ? 'Unlinked ' : 'All ')
                         + 'Images';
@@ -147,33 +151,35 @@ function mediaListRouter(req, res, next) {
                     var first = true;
                     var cells = [];
                     var cnt = 0;
-                    results.rows.forEach(function(r) {
-                        if (first) {
-                            res.locals['indi'] = {
-                                indi: r.INDI,
-                                name: r.LNAME + ', ' + r.FNAME,
-                                dates: r.dates,
-                                presumed: r.LIVING && ! isLogin
-                            };
-                            first = false;
-                        }
-                        cells.push({
-                            id: r.id,
-                            title: r.title,
-                            tdate: r.tdate,
-                            thumb: '/' + dbName + '/image/thumb/' +
-                                String(r.id).padStart(4,'0') + '.jpg',
-                            web: '/' + dbName + '/media/view/' + r.id,
-                            desc: r.desc,
-                            gid: r.gid
+                    if (results && results.rowCount > 0) {
+                        results.rows.forEach(function(r) {
+                            if (first) {
+                                res.locals['indi'] = {
+                                    indi: r.INDI,
+                                    name: r.LNAME + ', ' + r.FNAME,
+                                    dates: r.dates,
+                                    presumed: r.LIVING && ! isLogin
+                                };
+                                first = false;
+                            }
+                            cells.push({
+                                id: r.id,
+                                title: r.title,
+                                tdate: r.tdate,
+                                thumb: '/' + dbName + '/image/thumb/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
+                                web: '/' + dbName + '/media/view/' + r.id,
+                                desc: r.desc,
+                                gid: r.gid
+                            });
+                            cnt++;
+                            if (cnt % 5 == 0) {
+                                rows.push(cells);
+                                cnt = 0;
+                                cells = [];
+                            }
                         });
-                        cnt++;
-                        if (cnt % 5 == 0) {
-                            rows.push(cells);
-                            cnt = 0;
-                            cells = [];
-                        }
-                    });
+                    }
                     if (cells.length > 0) {
                         rows.push(cells);
                     }
@@ -204,15 +210,17 @@ function mediaListRouter(req, res, next) {
                         next(err);
                     }
 
-                    results.rows.forEach(function(r) {
-                        rows.push({
-                            indi: r.INDI,
-                            name: r.LNAME + ', ' + r.FNAME,
-                            presumed: r.LIVING && ! isLogin,
-                            dates: r.dates,
-                            photo_cnt: r.photo_cnt
+                    if (results && results.rowCount > 0) {
+                        results.rows.forEach(function(r) {
+                            rows.push({
+                                indi: r.INDI,
+                                name: r.LNAME + ', ' + r.FNAME,
+                                presumed: r.LIVING && ! isLogin,
+                                dates: r.dates,
+                                photo_cnt: r.photo_cnt
+                            });
                         });
-                    });
+                    }
                     res.locals['rows'] = rows;
                     res.locals['header'] = 'Summary of Photos by Individuals';
 
@@ -282,14 +290,14 @@ function mediaListRouter(req, res, next) {
         }
         else if (mode == 'search') {
             page = 'medialist1';
-            var sql = `select a.id, tdate, title, desc, gid, count(b.indi) as indi_cnt
+            var sql = `select a.id, tdate, a.title, desc, gid, count(b.indi) as indi_cnt
                 from photos a left join indi_photos b on a.id=b.id
                     left join indi c on b.indi=c.indi
                 where upper(a.title) like upper(?) or
                     upper(a.desc) like upper(?) or
                     upper(c.lname) like upper(?) or
                     upper(c.fname) like upper(?)
-                group by a.id, tdate, title, desc, gid
+                group by a.id, tdate, a.title, desc, gid
                 order by date, a.id`;
 
             var sstr = req.query.sstr;
@@ -303,20 +311,22 @@ function mediaListRouter(req, res, next) {
                     }
 
                     res.locals['rows'] = [];
-                    results.rows.forEach(function(r) {
-                        res.locals.rows.push({
-                            id: r.id,
-                            tdate: r.tdate,
-                            title: r.title,
-                            thumb: '/' + dbName + '/image/thumb/' +
-                                String(r.id).padStart(4,'0') + '.jpg',
-                            web: '/' + dbName + '/image/web/' +
-                                String(r.id).padStart(4,'0') + '.jpg',
-                            desc: r.desc,
-                            gid: r.gid,
-                            indi_cnt: r.indi_cnt
+                    if (results && results.rowCount > 0) {
+                        results.rows.forEach(function(r) {
+                            res.locals.rows.push({
+                                id: r.id,
+                                tdate: r.tdate,
+                                title: r.title,
+                                thumb: '/' + dbName + '/image/thumb/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
+                                web: '/' + dbName + '/image/web/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
+                                desc: r.desc,
+                                gid: r.gid,
+                                indi_cnt: r.indi_cnt
+                            });
                         });
-                    });
+                    }
 
                     res.locals['header'] = "Photos from Search for '" + sstr + "'";
 

@@ -24,6 +24,8 @@ function mediaEditRouter(req, res, next) {
 
     var pool = require('../db-config').createConnection(dbName);
     var rows = [];
+    var nextID = 1;
+    var prevID = 1;
 
     function getIndisFromList(list, callback) {
         if (! list || list == '') {
@@ -67,6 +69,41 @@ function mediaEditRouter(req, res, next) {
             });
         }
     }
+
+    function getNextPrev(id, callback) {
+        pool.acquire(function(err, conn3) {
+            if (err) {
+                console.error(err);
+                next(err);
+            }
+
+            var sql = `select coalesce(next, minid) as next, coalesce(prev, maxid) as prev
+                from (
+                    select (select min(id) from photos where id>?) as next,
+                        (select max(id) from photos where id<?) as prev,
+                        minid, maxid
+                    from
+                    (select min(id) as minid, max(id) as maxid from photos) as foo
+                ) as bar`;
+
+            conn3.query(sql, [id, id], function(err, results) {
+                if (err) {
+                    console.error(err);
+                    next(err);
+                }
+
+                if (results && results.rowCount>0) {
+                    nextID = results.rows[0].next;
+                    prevID = results.rows[0].prev;
+                }
+
+                pool.release(conn3);
+
+                callback();
+            });
+        });
+    }
+
 
     pool.acquire(function(err, conn) {
         if (err) {
@@ -123,21 +160,23 @@ function mediaEditRouter(req, res, next) {
                     pool.release(conn);
 
                     getIndisFromList(r.indi_list, function() {
-                        res.locals['photo'] = rows[0];
-                        res.locals['prev_id'] = Math.max(pid - 1, 1);
-                        res.locals['id'] = pid;
-                        res.locals['next_id'] = pid + 1;
-                        res.locals['pgroups'] = req.app.locals.pgroups;
+                        getNextPrev(pid, function() {
+                            res.locals['photo'] = rows[0];
+                            res.locals['prev_id'] = prevID;
+                            res.locals['id'] = pid;
+                            res.locals['next_id'] = nextID;
+                            res.locals['pgroups'] = req.app.locals.pgroups;
 
-                        pool.close();
+                            pool.close();
 
-                        //console.log(JSON.stringify(res.locals, null, 2));
-                        if (req.originalUrl.match(/\/view\//)) {
-                            res.render('mediaview');
-                        }
-                        else {
-                            res.render('mediaedit');
-                        }
+                            //console.log(JSON.stringify(res.locals, null, 2));
+                            if (req.originalUrl.match(/\/view\//)) {
+                                res.render('mediaview');
+                            }
+                            else {
+                                res.render('mediaedit');
+                            }
+                        });
                     });
                 }
                 else {

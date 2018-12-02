@@ -23,12 +23,12 @@ function mediaDeletePostRouter(req, res, next) {
         var next_id = parseInt(id) + 1;
         var url = '/' + dbName + '/media/edit/' + next_id;
 
-        var glob = require('glob-fs')({ gitignore: true });
+        var glob = require('glob');
         var file = String(id).padStart(4, '0');
         var path = __dirname + '/media/' + dbName + '/orig/' + file + '.*';
         var files = [];
         try {
-            files = glob.readdirSync(path);
+            files = glob.sync(path);
             files.push(__dirname + '/media/' + dbName + '/web/' + file + '.jpg');
             files.push(__dirname + '/media/' + dbName + '/thumb/' + file + '.jpg');
 
