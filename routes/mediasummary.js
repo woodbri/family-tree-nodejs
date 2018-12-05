@@ -105,7 +105,7 @@ function mediaSummaryRouter(req, res, next) {
                 next(err);
             }
 
-            var sql = 'select a.*, count(*) as cnt from pgroups a, photos b where a.id=b.gid group by a.id order by a.id';
+            var sql = 'select a.*, count(*) as cnt from pgroups a left join photos b on a.id=b.gid group by a.id order by a.id';
 
             conn.query(sql, [], function(err, results) {
                 if (err) {

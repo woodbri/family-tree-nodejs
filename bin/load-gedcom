@@ -905,7 +905,8 @@ function createTables(conn, useDB) {
         indi_photos: [
             [ 'indi' , 'varchar', 10, 'not null' ],
             [ 'id'   , 'integer', '', 'not null' ],
-            [ '', '', '', 'primary key (id, indi)' ]
+            [ '', '', '', 'primary key (id, indi)' ],
+            [ '', '', '', 'foreign key (indi) references indi(indi)' ]
         ],
         pgroups: [
             [ 'id'   , 'serial',  '', 'not null' ],

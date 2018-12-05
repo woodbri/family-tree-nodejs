@@ -1,3 +1,5 @@
+var createError = require('http-errors');
+
 function mediaLinkRouter(req, res, next) {
 
     // if req.query.add
@@ -48,17 +50,19 @@ function mediaLinkRouter(req, res, next) {
         pool.acquire(function(err, conn) {
             if (err) {
                 console.error(err);
-                next(err);
-            }
-
-            conn.query(sql, params, function(err, results) {
-                if (err) {
-                    console.error(err);
-                    next(err);
-                }
-                pool.release(conn);
                 pool.close()
                 res.redirect('/' + dbName + '/media/edit/' + id);
+            }
+
+            conn.query('PRAGMA foreign_keys=ON', [], function(err, results) {
+                conn.query(sql, params, function(err, results) {
+                    if (err) {
+                        console.error(err);
+                    }
+                    pool.release(conn);
+                    pool.close()
+                    res.redirect('/' + dbName + '/media/edit/' + id);
+                });
             });
         });
     }

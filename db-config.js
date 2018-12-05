@@ -40,10 +40,10 @@ var dbs = {
 
         var anyDB = require('any-db');
 
-        var conn = anyDB.createPool(dbURL);
-        conn['adapter'] = dbURL.adapter;
+        var pool = anyDB.createPool(dbURL);
+        pool['adapter'] = dbURL.adapter;
 
-        return conn;
+        return pool;
     }
 };
 
