@@ -3,15 +3,19 @@
 
 <h2>Images for <a href="/{{dbName}}/indi/{{indi.indi}}">{{indi.name}}</a> {{indi.dates}}</h2>
 
-<table width="100%" cols="5">
+<table width="100%" cols="{{ncol}}">
 {{#each rows as |row|}}
 <tr>
     {{#each row as |cell|}}
-    <td width="20%" align="center" valign="top">
+    <td align="center" valign="top">
+{{#if ../../large}}
+<img src="{{cell.picts}}"><br>
+{{else}}
 <a href="{{cell.web}}" target="_photo"><img src="{{cell.thumb}}"></a><br>
+{{/if}}
 {{cell.title}}<br>
 {{cell.tdate}}{{#if ../../addDesc}}<br>
-{{cell.desc}}{{/if}}
+{{cell.desc}}{{/if}}<br>&nbsp;
     </td>
     {{/each}}
 </tr>

@@ -21,6 +21,7 @@
 <p><b>year</b>=[<b>all</b>|<b>living</b>|&lt;YYYY&gt;]<br>Shows people sorted by their birthday since <b>YYYY</b> or <b>all</b> or <b>living</b> people in the database.</p>
 <p><b>byname</b>=1&nbsp;&nbsp;Sort the resulting list by Name instead of by dates.</p>
 <p><b>day</b>=MM-DD&nbsp;&nbsp;Show only people that share this birthday.</p>
+<p><b>csv=1</b> Download the list of birthdays as birthdays.csv file.</p>
 </ul>
 </p></p>
 <p><b>feedback</b><br>Shows a form to send feedback to the database owner.</p>
@@ -33,6 +34,38 @@
 <p><b>dates</b>=1&nbsp;&nbsp;Add (birth - death) to each person.</p>
 <p><b>max</b>=&lt;nn&gt;&nbsp;&nbsp;Limit the display to a maximum of <b>nn</b> generations below the person. The default is 20.</p>
 </ul>
+<p>If photos and photo management are enable you have the following <b>command</b>s. Ones that update the database or upload photos, require the user to be logged in with admin previleges.</p>
+<p><b>media/summary</b> - list summary of photos loaded and photo albums</p>
+<p><b>media/list/&lt;MODE&gt;/&lt;ID&gt;</b>
+<ul>
+<li>MODE=<b>indi</b> - display summary of photos linked to each person in the database
+<li>MODE=<b>indi</b> and <b>ID</b>=&lt;INDI&gt; - display all photos linked to INDI you can these query parameters to change the output.
+<ul>
+<li><b>ncol=&lt;NUM&gt;</b> - number of columns of photos on the page (default: 5)
+<li><b>large=1</b> - optionally display large images rather than thumbnails (try: <b>?ncols=2&amp;large=1</b>
+</ul>
+<li>MODE=<b>group</b> and <b>ID</b>=&lt:GROUP_ID&gt; - displays thumbnails for all photos in group=GROUP_ID
+<li>MODE=<b>photos</b> and <b>ID</b>=[<b>all</b>|<b>unlinked</b>|&lt;ID&gt;]
+<ul>
+<li><b>all</b> - display thumbnails for all photos.
+<li><b>unlinked</b> - display thumbnails for all photos not linked to people.
+<li>ID - display the photo=ID in the edit form
+</ul>
+<li>MODE=<b>search?sstr=&lt;STRING&gt;</b> = search photo titles. descriptions, and linked names for STRING
+</ul>
+<p><b>media/view/&lt;ID&gt;</b> - display a page of photo=ID and people linked to it.</p>
+<p><b>image/&ltMODE&gt;/&lt;FILE&gt;</b> - return the photo as an image.
+<ul>
+<li>MODE=[<b>orig</b>|<b>web</b>|<b>thumb</b>]
+<li>FILE=ID.EXT - where ID is photo ID (zero padded to 4 digits) and EXT is the file extension typically <b>jpg</b> for <b>web</b> and <b>thumb</b>, but <b>orig</b> images are based on what was uploaded.
+</ul>
+<p><b>media/upload</b> - Upload a photo and update the database with it. (requires admin)</p>
+<p><b>media/edit/&lt;ID&gt;</b> - Display photo=ID in the edit form. (requires admin to make changes)</p>
+<p><b>media/link/&lt;ID&gt;?[add|del]=&lt;INDI&gt;</b> - add or remove INDI from photo=ID (requires admin).</p>
+<p><b>media/delete/&lt;ID&gt;</b> - deletes a photo from the server and all associated links. (requires admin).</p>
+
+</ul>
+
 </ul>
 
 <p>&nbsp;</p>

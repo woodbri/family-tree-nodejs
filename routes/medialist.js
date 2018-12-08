@@ -133,6 +133,14 @@ function mediaListRouter(req, res, next) {
         }
         else if (mode == 'indi') {
             if (id.match(/^i\d+$/)) {
+                var ncol = 5;
+                if (req.query.ncol && ! isNaN(parseInt(req.query.ncol))) {
+                    ncol = parseInt(req.query.ncol);
+                }
+                var large = false;
+                if (req.query.large) {
+                    large = true;
+                }
                 id = id.toUpperCase();
                 page = 'medialist3';
                 var sql = `select a.indi, lname, fname, living,
@@ -170,12 +178,14 @@ function mediaListRouter(req, res, next) {
                                 tdate: r.tdate,
                                 thumb: '/' + dbName + '/image/thumb/' +
                                     String(r.id).padStart(4,'0') + '.jpg',
+                                picts: '/' + dbName + '/image/web/' +
+                                    String(r.id).padStart(4,'0') + '.jpg',
                                 web: '/' + dbName + '/media/view/' + r.id,
                                 desc: r.desc,
                                 gid: r.gid
                             });
                             cnt++;
-                            if (cnt % 5 == 0) {
+                            if (cnt % ncol == 0) {
                                 rows.push(cells);
                                 cnt = 0;
                                 cells = [];
@@ -188,6 +198,8 @@ function mediaListRouter(req, res, next) {
 
                     res.locals['rows'] = rows;
                     res.locals['addDesc'] = true;
+                    res.locals['ncol'] = ncol;
+                    res.locals['large'] = large;
 
                     //console.log(JSON.stringify(res.locals, null, 2));
 
