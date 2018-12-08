@@ -3,28 +3,28 @@
   <td class=h1 align=left>Web Photo Manager</td>
   <td>
   <table align=right><tr>
-    <form action="/{{dbName}}/media/edit/{{prev_id}}" method="get">
-      <td align=right>
+    <td align=right>
+      <form action="/{{dbName}}/media/edit/{{prev_id}}" method="get">
         <input type="submit" value="PREV">
-      </td>
-    </form>
-    <form action="/{{dbName}}/media/edit/{{next_id}}" method="get">
-      <td align=center>
+      </form>
+    </td>
+    <td align=center>
+      <form action="/{{dbName}}/media/edit/{{next_id}}" method="get">
         <input type="submit" value="NEXT">
-      </td>
-    </form>
-    <form action="/{{dbName}}/media/edit/0" method="get">
-      <td align="center">
+      </form>
+    </td>
+    <td align="center">
+      <form action="/{{dbName}}/media/edit/0" method="get">
         <input type="input" size="10" maxlength="10" name="id" value="{{next_id}}">
         <input type="submit" value="GO TO">
-      </td>
-    </form>
+      </form>
+    </td>
 {{#if isAdmin}}
-    <form action="/{{dbName}}/media/delete/{{id}}" method="get">
-      <td align=center>
+    <td align=center>
+      <form action="/{{dbName}}/media/delete/{{id}}" method="get">
         <input type="submit" value="DELETE">
-      </td>
-    </form>
+      </form>
+    </td>
 {{/if}}
     </tr></table>
   </tr>
@@ -96,6 +96,9 @@
 
 <p>Individuals associated with photo {{id}}</p>
 
+{{#if isAdmin}}
+<form action="/{{dbName}}/media/link/{{id}}" method="get">
+{{/if}}
 
 <table cellpadding=0 cellspacing=0 width=95% border=1>
 <tr>
@@ -117,14 +120,24 @@
 </tr>
 {{/each}}
 {{#if isAdmin}}
-<form action="/{{dbName}}/media/link/{{id}}" method="get">
 <tr>
   <td colspan="3"><input id="add" type="text" name="add" value="" size="10"></td>
   <td align=center><input type="submit" value="ADD"></td>
 </tr>
 {{/if}}
-</form>
+{{#if isAdmin}}
+<tr>
+</tr>
+{{/if}}
 </table>
+
+{{#if isAdmin}}
+</form>
+<br>
+<form action="/{{dbName}}/media/link/{{id}}" method="get">
+  <p>Copy individuals from photo <input type="text" name="cpy" value="" size="10">&nbsp;<input type="submit" value="COPY"></p>
+</form>
+{{/if}}
 
 </td></tr></table>
 
