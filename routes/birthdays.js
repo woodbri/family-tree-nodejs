@@ -14,27 +14,37 @@ function birthdayRouter(req, res, next) {
     var year = typeof req.query.year === 'undefined' ? 'living' : req.query.year.toLowerCase();
     var day = req.query.day;
 
-    var sql = 'select indi, lname, fname, bdate, living from indi where ';
+    var sql;
+    if (typeof req.query.married === 'undefined') {
+        sql = `select a.indi, lname || ', ' || fname as name, a.bdate, a.living from indi a where `;
+    }
+    else {
+        sql = `select a.indi, case when d.lname is not null then d.lname || ', ' || a.fname || ' ' || a.lname 
+                else a.lname || ', ' || a.fname end as name, a.bdate, a.living
+            from indi a left join fams b on a.indi=b.indi and b.seq=(select max(x.seq) from fams x where x.indi=a.indi)
+                left join fami c on b.fami=c.fami
+                left join indi d on d.indi=case when a.indi=c.husb then null else c.husb end where `;
+    }
     if (year == 'all') {
         sql += 'true ';
     }
     else if (year.match(/^\d+$/)) {
-        sql += "cast(bdate as int) >= " + year + " ";
+        sql += "cast(a.bdate as int) >= " + year + " ";
     }
     else {
-        sql += 'living ';
+        sql += 'a.living ';
     }
 
     if (typeof day !== 'undefined' && day.match(/^\d\d-\d\d$/)) {
-        sql += "and substr(bdate, 6, 5)='" + day + "'";
+        sql += "and substr(a.bdate, 6, 5)='" + day + "'";
         resData['day'] = day;
     }
 
     if (typeof req.query.byname === 'undefined') {
-        sql += ' order by substr(bdate, 6, 5) asc, bdate, lname, fname ';
+        sql += ' order by substr(a.bdate, 6, 5) asc, a.bdate, name ';
     }
     else {
-        sql += ' order by lname, fname ';
+        sql += ' order by name ';
     }
 
     //console.log(sql);
@@ -58,16 +68,26 @@ function birthdayRouter(req, res, next) {
                 if (!r.LIVING || (req.session && req.session.user)) {
                     rows.push({
                         indi: r.INDI,
-                        name: r.LNAME + ', ' + r.FNAME,
+                        name: r.name,
                         date: r.BDATE
                     });
                 }
             });
 
-            resData['rows'] = rows;
-            res.locals = resData;
             pool.release(conn);
-            res.render('birthdays');
+            if (typeof req.query.csv === 'undefined') {
+                resData['rows'] = rows;
+                res.locals = resData;
+                res.render('birthdays');
+            }
+            else {
+                const json2csv = require('json2csv');
+                const fields = ['indi', 'name', 'date'];
+                const csv = json2csv.parse(rows, {fields: fields});
+                res.setHeader('Content-disposition', 'attachment; filename=birthdays.csv');
+                res.set('Content-Type', 'text/csv');
+                res.status(200).send(csv);
+            }
         });
     });
 

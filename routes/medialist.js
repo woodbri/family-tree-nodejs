@@ -84,10 +84,11 @@ function mediaListRouter(req, res, next) {
 
                 var having = id == 'unlinked' ? ' having indi_cnt = 0 ' : '';
 
-                var sql = `select a.id, tdate, title, desc, gid, count(b.indi) as indi_cnt
+                var sql = `select a.id, tdate, title, a.desc, gid, c.desc as grp, count(b.indi) as indi_cnt
                     from photos a left join indi_photos b on a.id=b.id
+                        left join pgroups c on c.id=gid
                     ` + where + `
-                    group by a.id, tdate, title, desc, gid
+                    group by a.id, tdate, title, a.desc, gid, grp
                     ` + having + `
                     order by a.date, a.id`;
 
@@ -109,6 +110,7 @@ function mediaListRouter(req, res, next) {
                                     String(r.id).padStart(4,'0') + '.jpg',
                                 desc: r.desc,
                                 gid: r.gid,
+                                grp: r.grp,
                                 indi_cnt: r.indi_cnt
                             });
                         });

@@ -3,8 +3,8 @@
 <form method="get">
 Max Year (all|living|YYYY): <input type="text" size="6" {{#if query.year}}value="{{query.year}}" {{/if}}name="year"> |
 Day (MM-DD|blank}: <input type="text" size="6" {{#if query.day}}value="{{query.day}}" {{/if}}name="day"> |
-<input type="checkbox" {{#if query.byname}}checked{{/if}} name="byname"> Sort by Names |
-<input type="submit" value="Update">
+<input type="checkbox" {{#if query.byname}}checked{{/if}} name="byname"> Sort by Names | <input type="checkbox" {{#if query.married}}checked{{/if}} name="married"> Use married names |
+<input type="submit" value="Update"> | <input type="submit" value="CSV" name="csv">
 </form>
 </td></tr>
 <tr><td>
