@@ -90,6 +90,27 @@ cp sample-db.cfg db/mygedcom/mygedcom.cfg
 cp sample-db.about db/mygedcom/mygedcom.about
 ```
 
+### Updating your database with photo tables
+
+Since all the info about photos and links to individuals is stored in the database, you need
+to make sure you don't delete or loose it. This process deals with update your database
+with an updated GEDCOM when you have photos linked to the GEDCOM file.
+
+    NOTE: because we link photos to the unique Ixxxx assigned each individual in the GEDCOM
+    file it is CRITICAL that your DO NOT renumber the individuals in your genealogy program
+    or it will MESS UP you linkages!!!!
+
+```
+cp db/<dbname>/<dbname>.db test.db
+bin/load-gedcom < path/to/mygedcom.ged
+mv test.db db/<dbname>/<dbname>.db
+```
+
+The first command copies your existing database with the photo tables in it. Then the next command
+drops the genealogy tables only leaving the photos in place and reloads the genealogy tables
+from the GEDCOM. Family the last command moves the updated test.db back into place and you should
+have both the new genealogy data and you existing photo tables.
+
 ### Integrating Photos with your Genealogy Data
 
 This code currently does not support GEDCOM 5.5 support for media links. This could be

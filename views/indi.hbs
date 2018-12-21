@@ -32,7 +32,7 @@
 
 {{#each families as |fam|}}
 <div class=p>
-<br><B>Family {{inc @index}} : </B>{{#if fam.spouse.presumed}}Presumed Living{{else}}<a href="/{{../../dbName}}/indi/{{fam.spouse.indi}}">{{fam.spouse.lname}}, {{fam.spouse.fname}}</a>{{/if}}
+<br><B>Family {{inc @index}} : </B>{{#if fam.spouse.presumed}}Presumed Living{{else}}{{#if fam.spouse.indi}}<a href="/{{../../dbName}}/indi/{{fam.spouse.indi}}">{{fam.spouse.lname}}, {{fam.spouse.fname}}</a>{{/if}}{{/if}}
 {{#if fam.spouse.presumed}}{{else}}
 {{#if fam.sources}}
 {{#each fam.sources as |seq|}}

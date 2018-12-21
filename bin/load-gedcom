@@ -90,56 +90,56 @@ process.stdin.pipe(concat(function(buf) {
 * return string - the mapped name or tag.toLowerCase()
 */
 function mapTag(tag) {
-var tags = {
-  "NAME": 'Name',
-  "SEX": 'Sex',
-  "BIRT": 'Birth',
-  "DEAT": 'Death',
-  // "FAMS": 'Family of spouse',
-  // "FAMC": 'Family of child',
-  "NOTE": 'Note',
-  "REFN": 'Reference',
-  "TITL": 'Title',
-  "OCCU": 'Occupation',
-  "EVEN": 'Event',
-  "BAPM": 'Baptism',
-  "IMMI": 'Immigration',
-  "ALIA": 'Alias',
-  "SSN": 'Social Security No.',
-  "RESI": 'Residence',
-  "ADOP": 'Adoption',
-  "EMIG": 'Emigration',
-  "ADDR": 'Address',
-  "PHON": 'Phone',
-  "CHR": 'Christening',
-  "WILL": 'Will',
-  "PROB": 'Probate',
-  "CHAN": 'Changed',
-  "CONF": 'Conference',
-  "GRAD": 'Graduation',
-  "ORDN": 'Ordination',
-  "CREM": 'Cremation',
-  "_MILT": 'Military',
-  "RELI": 'Religion',
-  "ARVL": 'Arrival',
-  "DPRT": 'Departure',
-  "CENS": 'Census',
-  // Tags from marriages
-  'HUSB': 'Husband',
-  'WIFE': 'Wife',
-  'CHIL': 'Child',
-  "MARR": 'Marriage',
-  "DIV": 'Divorced',
-  "_SEPR": 'Separated',
-  "ANUL": 'Annulled',
-};
+    var tags = {
+      "NAME": 'Name',
+      "SEX": 'Sex',
+      "BIRT": 'Birth',
+      "DEAT": 'Death',
+      // "FAMS": 'Family of spouse',
+      // "FAMC": 'Family of child',
+      "NOTE": 'Note',
+      "REFN": 'Reference',
+      "TITL": 'Title',
+      "OCCU": 'Occupation',
+      "EVEN": 'Event',
+      "BAPM": 'Baptism',
+      "IMMI": 'Immigration',
+      "ALIA": 'Alias',
+      "SSN": 'Social Security No.',
+      "RESI": 'Residence',
+      "ADOP": 'Adoption',
+      "EMIG": 'Emigration',
+      "ADDR": 'Address',
+      "PHON": 'Phone',
+      "CHR": 'Christening',
+      "WILL": 'Will',
+      "PROB": 'Probate',
+      "CHAN": 'Changed',
+      "CONF": 'Conference',
+      "GRAD": 'Graduation',
+      "ORDN": 'Ordination',
+      "CREM": 'Cremation',
+      "_MILT": 'Military',
+      "RELI": 'Religion',
+      "ARVL": 'Arrival',
+      "DPRT": 'Departure',
+      "CENS": 'Census',
+      // Tags from marriages
+      'HUSB': 'Husband',
+      'WIFE': 'Wife',
+      'CHIL': 'Child',
+      "MARR": 'Marriage',
+      "DIV": 'Divorced',
+      "_SEPR": 'Separated',
+      "ANUL": 'Annulled',
+    };
 
-var t = tags[tag];
-if (typeof tags[tag] === 'undefined') {
-    t = tag.toLowerCase();
-}
+    var t = tags[tag];
+    if (typeof tags[tag] === 'undefined') {
+        t = tag.toLowerCase();
+    }
 
-return t;
+    return t;
 }
 
 /**
@@ -932,7 +932,7 @@ function createTables(conn, useDB) {
         photos.pgroups = [
             [ 'id'   , 'integer',  '', 'primary key' ],
             [ 'desc' , 'varchar', 200, 'not null' ],
-        };
+        ];
 
         schema.child = [
             [ 'FAMI'  , 'varchar'  , 10 , "NOT NULL" ],
