@@ -72,7 +72,12 @@ function descendantsRouter(req, res, next) {
     var rows = [];
 
     function linkName(indi, name) {
-        return '<a href="/' + dbName + '/indi/' + indi + '">' + name + '</a>';
+        if (! indi) {
+            return '';
+        }
+        else {
+            return '<a href="/' + dbName + '/indi/' + indi + '">' + name + '</a>';
+        }
     }
 
     function isLiving(living, text) {
@@ -110,22 +115,23 @@ function descendantsRouter(req, res, next) {
     children_of (indi, fams, spouse, seq, cindi) as (
         select s.indi, s.fami as fams, case when s.indi=f.husb then f.wife else f.husb end as spouse,
                c.seq, c.indi as cindi
-          from fami f, fams s, child c
-         where s.fami=f.fami and s.fami=c.fami
+          from fami f join fams s on s.fami=f.fami
+            left join child c on s.fami=c.fami
     ),
     children_of_with_names (indi, fams, spouse, seq, cindi, name, sname, cname, refn, srefn, crefn, living, sliving, cliving) as (
         select d.*,
-                a.fname || ' ' || a.lname as name,
-                b.fname || ' ' || b.lname as sname,
-                c.fname || ' ' || c.lname as cname,
+                coalesce(a.fname, '') || ' ' || coalesce(a.lname, '') as name,
+                coalesce(b.fname, '') || ' ' || coalesce(b.lname, '') as sname,
+                coalesce(c.fname, '') || ' ' || coalesce(c.lname, '') as cname,
                 coalesce(a.refn, '') as refn,
                 coalesce(b.refn, '') as srefn,
                 coalesce(c.refn, '') as crefn,
                 a.living as living,
                 b.living as sliving,
                 c.living as cliving
-          from children_of d, indi a, indi b, indi c
-         where d.indi=a.indi and d.spouse=b.indi and d.cindi=c.indi
+          from children_of d left join indi a on d.indi=a.indi
+            left join indi b on d.spouse=b.indi
+            left join indi c on d.cindi=c.indi
     ),
     descendants (level, indi, fams, spouse, seq, cindi, name, sname, cname, refn, srefn, crefn, living, sliving, cliving) as (
         select 0 as level, c.*

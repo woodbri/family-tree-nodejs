@@ -223,7 +223,10 @@ function indiRouter(req, res, next) {
                         console.error(err);
                         next(err);
                     }
-                    var sql = 'select b.* from child a, indi b where a.indi=b.indi and a.fami=? order by a.seq asc';
+                    var sql = `select b.*,
+                    '(' || coalesce(substr(bdate,1,4), '____') || ' - ' ||
+                           coalesce(substr(ddate,1,4), '____') || ')' as dates
+                        from child a, indi b where a.indi=b.indi and a.fami=? order by a.seq asc`;
                     conn.query(sql, [fami], function(err, results) {
                         if (err) {
                             console.error(err);
@@ -235,6 +238,7 @@ function indiRouter(req, res, next) {
                                 indi: r.INDI,
                                 lname: r.LNAME,
                                 fname: r.FNAME,
+                                dates: r.dates,
                                 sex: r.SEX,
                                 presumed: r.LIVING && !(req.session && req.session.user)
                             });

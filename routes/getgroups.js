@@ -9,7 +9,7 @@ function getGroupsRouter(req, res, next) {
                 next(err);
             }
 
-            var sql = 'select * from pgroups order by id';
+            var sql = 'select * from pgroups order by id desc';
             conn.query(sql, [], function(err, results) {
                 if (err) {
                     console.error(err);

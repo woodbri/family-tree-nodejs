@@ -52,7 +52,7 @@
 
  <ol>
  {{#each fam.children as |child|}}
- <li>{{#if child.presumed}}Presumed Living{{else}}<a href="/{{../../../dbName}}/indi/{{child.indi}}">{{child.lname}}, {{child.fname}}</a> - {{child.sex}}{{/if}}
+ <li>{{#if child.presumed}}Presumed Living{{else}}<a href="/{{../../../dbName}}/indi/{{child.indi}}">{{child.lname}}, {{child.fname}}</a> - {{child.sex}} - {{child.dates}}{{/if}}
  {{/each}}
  </ol>
 
