@@ -32,4 +32,9 @@ td         {color: #003300; font-family:Verdana, Arial;
             font-size: 11px}
 td.small   {color: #003300; font-family:Verdana, Arial;
             font-size: 9px}
-
+ul.noindent {
+    margin-left: 16px;
+    margin-right: 0px;
+    padding-left: 10px;
+    padding-right: 0px;
+}

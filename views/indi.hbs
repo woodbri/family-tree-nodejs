@@ -50,11 +50,22 @@
  </ul>
  {{/if}}
 
- <ol>
+ <ul class="noindent">
+ <table border="0" cols="4" cellpadding="0">
  {{#each fam.children as |child|}}
- <li>{{#if child.presumed}}Presumed Living{{else}}<a href="/{{../../../dbName}}/indi/{{child.indi}}">{{child.lname}}, {{child.fname}}</a> - {{child.sex}} - {{child.dates}}{{/if}}
+   <tr>
+    <td align="right">{{inc @index}}.&nbsp;</td>
+    {{#if child.presumed}}
+    <td colspan="3">Presumed Living</td>
+    {{else}}
+    <td><a href="/{{../../../dbName}}/indi/{{child.indi}}">{{child.lname}}, {{child.fname}}</a></td>
+    <td>&nbsp;{{child.sex}}&nbsp;</td>
+    <td>{{child.dates}}</td>
+    {{/if}}
+   </tr>
  {{/each}}
- </ol>
+ </table>
+ </ul>
 
  {{/each}}
  </td>
@@ -70,22 +81,17 @@
  <td align=center valign=top><a href="{{cell.web}}" target=_photos><img src="{{cell.thumb}}"></a></td>
  {{/each}}
  </tr>
- <tr>
  {{/each}}
  {{#if morephotos}}
- </tr>
  <tr><td align=center colspan=3>
- <a href="/{{../dbName}}/media/list/indi/{{indi}}" target="_photosr"> View all {{morephotos}} photos</a></td>
- </tr>
+ <a href="/{{../dbName}}/media/list/indi/{{indi}}" target="_photosr"> View all {{morephotos}} photos</a>
+ </td> </tr>
  {{/if}}
  {{#if ../isAdmin}}
  <tr><td align=center colspan=3>
  <a href="/{{../dbName}}/media/upload?indi={{indi}}">Upload New Photo</a>
  </td> </tr>
  {{/if}}
- </table>
-
- </td></tr>
  </table>
  </td>
  {{else}}
@@ -95,7 +101,6 @@
  </td>
  {{/if}}
  {{/if}}
-
  </tr>
  </table>
 
@@ -113,7 +118,5 @@
  {{{pedigree}}}
  </pre>
  </div>
- </td></tr>
- </table>
 {{/with}}
 {{/if}}
