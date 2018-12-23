@@ -35,10 +35,11 @@ function descendantsRouter(req, res, next) {
                         }
                         else {
                             // console.log([idx, results2.rows[0].dates]);
+                            dates = results2.rows[0].dates;
                             pool.release(conn);
                             resolve({
                                 idx: idx,
-                                text: results2.rows[0].dates
+                                text: dates
                             });
                         }
                     });
@@ -160,16 +161,31 @@ function descendantsRouter(req, res, next) {
                                 // NOTE: for async functions just return value or throw error
                                 // don't use the callback
                                 dates: async function(callback) {
-                                    var rr = await getDates(dbName, r.indi, idx);
-                                    return rr;
+                                    if (r.indi) {
+                                        var rr = await getDates(dbName, r.indi, idx);
+                                        return rr;
+                                    }
+                                    else {
+                                        return '';
+                                    }
                                 },
                                 sdates: async function(callback) {
-                                    var rr = await getDates(dbName, r.spouse, idx);
-                                    return rr;
+                                    if (r.spouse) {
+                                        var rr = await getDates(dbName, r.spouse, idx);
+                                        return rr;
+                                    }
+                                    else {
+                                        return '';
+                                    }
                                 },
                                 cdates: async function(callback) {
-                                    var rr = await getDates(dbName, r.cindi, idx);
-                                    return rr;
+                                    if (r.cindi) {
+                                        var rr = await getDates(dbName, r.cindi, idx);
+                                        return rr;
+                                    }
+                                    else {
+                                        return '';
+                                    }
                                 }
                             },
                             function(err, results) {
@@ -207,12 +223,14 @@ function descendantsRouter(req, res, next) {
                                           (addindi ? ' {' + r.spouse + '}' : '');
                             text += '|    '.repeat(r.level) + 'm. ' + isLiving(r.sliving, linkName(r.spouse, r.sname) + addons) + "\n";
                         }
-                        addons = ' ' + (adddate ? r.cdates : '') +
-                                      (addrefn && r.crefn ? ' [' + r.crefn + ']' : '') +
-                                      (addindi ? ' {' + r.cindi + '}' : '');
-                        text += '|    '.repeat(r.level+1) + isLiving(r.cliving, linkName(r.cindi, r.cname) + addons) + "\n";
+                        if (r.cindi) {
+                            addons = ' ' + (adddate ? r.cdates : '') +
+                                          (addrefn && r.crefn ? ' [' + r.crefn + ']' : '') +
+                                          (addindi ? ' {' + r.cindi + '}' : '');
+                            text += '|    '.repeat(r.level+1) + isLiving(r.cliving, linkName(r.cindi, r.cname) + addons) + "\n";
 
-                        last = r.cindi;
+                            last = r.cindi;
+                        }
                     });
 
                     resData['line'] = text;
