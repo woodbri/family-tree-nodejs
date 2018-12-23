@@ -145,8 +145,13 @@ function indiRouter(req, res, next) {
                 console.error(err);
                 next(err);
             }
-//            var sql = 'select d.* from indi a left join child b on a.indi=b.indi left join fami c on b.fami=c.fami left join indi d on d.indi in (c.husb, c.wife) where b.indi=? order by d.sex asc';
-            var sql = 'select d.* from indi a, child b, fami c, indi d where a.indi=b.indi and b.fami=c.fami and b.indi=? and d.indi in (c.husb,c.wife) order by d.sex asc';
+            var sql = `select d.*,
+                    '(' || coalesce(substr(d.bdate,1,4), '____') || ' - ' ||
+                           coalesce(substr(d.ddate,1,4), '____') || ')' as dates
+            from indi a, child b, fami c, indi d
+            where a.indi=b.indi and b.fami=c.fami and b.indi=? and d.indi in (c.husb,c.wife)
+            order by d.sex asc`;
+
             conn.query(sql, [indi], function(err, results) {
                 if (err) {
                     console.error(err);
@@ -158,6 +163,7 @@ function indiRouter(req, res, next) {
                         indi: r.INDI,
                         lname: r.LNAME,
                         fname: r.FNAME,
+                        dates: r.dates,
                         presumed: r.LIVING && !(req.session && req.session.user)
                     };
                     if (r.SEX == 'M') {
@@ -268,20 +274,15 @@ function indiRouter(req, res, next) {
                 console.error(err);
                 next(err);
             }
-            /*
-            var sql = `select a.fami, b.note as mnote, c.*,
-                (select group_concat(seq) from sourtxt where refid=a.fami) as source
-                from fams a, fami b, indi c
-                where a.fami=b.fami and c.indi in (husb,wife)
-                    and a.indi=? and c.indi != ? order by a.seq asc`;
-            */
             var sql = `with families as (
                     select a.fami, a.seq, b.note as mnote,
                             case when a.indi=b.wife then b.husb else b.wife end as spouse
                     from fams a, fami b
                     where a.fami=b.fami and indi=? order by seq asc
                 )
-                select d.*, c.*
+                select d.*, c.*,
+                    '(' || coalesce(substr(c.bdate,1,4), '____') || ' - ' ||
+                           coalesce(substr(c.ddate,1,4), '____') || ')' as dates
                 from families d left join indi c on d.spouse=c.indi
                 order by d.seq asc`;
 
@@ -298,6 +299,7 @@ function indiRouter(req, res, next) {
                             indi: r.INDI,
                             lname: r.LNAME,
                             fname: r.FNAME,
+                            dates: r.dates,
                             presumed: r.LIVING && !(req.session && req.session.user)
                         },
                         sources: r.source ? r.source.split(',') : [],

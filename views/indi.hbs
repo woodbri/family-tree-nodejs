@@ -26,13 +26,13 @@
 {{/each}}
 </ul>
 <div class=p>
-<B>Father: </B>{{#if father.presumed}}Presumed Living{{else}}{{#if father.indi}}<a href="/{{../dbName}}/indi/{{father.indi}}">{{father.lname}}, {{father.fname}}</a>{{/if}}{{/if}}<BR>
-<B>Mother: </B>{{#if mother.presumed}}Presumed Living{{else}}{{#if mother.indi}}<a href="/{{../dbName}}/indi/{{mother.indi}}">{{mother.lname}}, {{mother.fname}}</a>{{/if}}{{/if}}<BR>
+<B>Father: </B>{{#if father.presumed}}Presumed Living{{else}}{{#if father.indi}}<a href="/{{../dbName}}/indi/{{father.indi}}">{{father.lname}}, {{father.fname}}</a> - {{father.dates}}{{/if}}{{/if}}<BR>
+<B>Mother: </B>{{#if mother.presumed}}Presumed Living{{else}}{{#if mother.indi}}<a href="/{{../dbName}}/indi/{{mother.indi}}">{{mother.lname}}, {{mother.fname}}</a> - {{mother.dates}}{{/if}}{{/if}}<BR>
 </div>
 
 {{#each families as |fam|}}
 <div class=p>
-<br><B>Family {{inc @index}} : </B>{{#if fam.spouse.presumed}}Presumed Living{{else}}{{#if fam.spouse.indi}}<a href="/{{../../dbName}}/indi/{{fam.spouse.indi}}">{{fam.spouse.lname}}, {{fam.spouse.fname}}</a>{{/if}}{{/if}}
+<br><B>Family {{inc @index}} : </B>{{#if fam.spouse.presumed}}Presumed Living{{else}}{{#if fam.spouse.indi}}<a href="/{{../../dbName}}/indi/{{fam.spouse.indi}}">{{fam.spouse.lname}}, {{fam.spouse.fname}}</a> - {{fam.spouse.dates}}{{/if}}{{/if}}
 {{#if fam.spouse.presumed}}{{else}}
 {{#if fam.sources}}
 {{#each fam.sources as |seq|}}
