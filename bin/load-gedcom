@@ -8,7 +8,7 @@
 var DEBUG = false;
 var VERBOSE = true;
 
-var gedcom = require('parse-gedcom'),
+var gedcom = require('../parse-gedcom'),
     concat = require('concat-stream');
 
 var metaphone = require('metaphone');
@@ -16,6 +16,7 @@ var metaphone = require('metaphone');
 // Select the database you want to use and define an appropriate connection string for it
 // mysql|postgresql|sqlite3
 
+var useTextForNotes = true;
 var useDB = 'sqlite3'
 var anyDB;
 var dbURL;
@@ -728,8 +729,31 @@ function loadNote(conn, item) {
     var nid = cleanPointer(item.pointer);
     var sql_note = 'INSERT INTO notes (note, text) VALUES (?, ?)';
 
-    for (i in item.tree) {
-        conn.query(sql_note, [nid, item.tree[i].data]);
+    if (useTextForNotes) {
+        var rec = '';
+        for (i in item.tree) {
+            var line = item.tree[i];
+            if (line.tag == 'CONC') {
+                rec += line.data;
+            }
+            else if (line.tag == 'CONT') {
+                conn.query(sql_note, [nid, rec]);
+                rec = line.data;
+            }
+            else {
+                console.log('ERROR: Unknown tag (' + line.tag + ') in NOTE for:');
+                console.log(JSON.stringify(item, null, 2));
+                throw 'Error Unknown tag in NOTE!';
+            }
+        }
+        if (rec.length > 0) {
+            conn.query(sql_note, [nid, rec]);
+        }
+    }
+    else {
+        for (i in item.tree) {
+            conn.query(sql_note, [nid, item.tree[i].data]);
+        }
     }
 }
 
@@ -974,6 +998,10 @@ function createTables(conn, useDB) {
             [ 'TEXT',   'varchar', 255, '']
         ];
         indexes.push('create index sourtxt_refid_idx on sourtxt (refid, seq)');
+    }
+
+    if (useTextForNotes) {
+        schema.notes[2] = [ 'TEXT'  , 'text'  , "" , "" ];
     }
 
     if (DEBUG) {

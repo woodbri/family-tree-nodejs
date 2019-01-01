@@ -21,11 +21,18 @@ function notesRouter(req, res, next) {
             union all
             select * from (select text from notes where note=? order by seq asc) as foo`;
 
+        var re = /(https?:\/\/[-.\/~!@#$%^&*_+-=:";'<>?,.\[\]\w]+)/;
         conn.query(sql, [indi, noteId], function(err, results) {
             if (err) return console.error(err);
 
             results.rows.forEach(function(r) {
-                notes.push(htmlEncode(r.TEXT));
+                var str = r.TEXT.replace(re, "<a href=\"$1\" target=\"_new\">$1</a>");
+                if (r.TEXT != str) {
+                    notes.push(str);
+                }
+                else {
+                    notes.push(htmlEncode(r.TEXT));
+                }
             });
             pool.release(conn);
 

@@ -3,6 +3,8 @@
 This application is a Node.js webserver that serves family tree information from a GEDCOM loaded into a Sqlite database.
 It can be configured to serve multiple separate databases and each database can its own configuration.
 
+Performance is generally very good, 100-200 ms on most requests with the exception of the descendants listing that can take several minutes for a large number of descendants due to the fact that the query is recursive and needs to collect all the children of all families down through all generations from the selected individual. For example in my database, six generations and about 150 individuals in the list took about 3 seconds using a sqlite database.
+
 This was built to work with my GEDCOM files and it might need changes and/or additions to work with other GEDCOM files. I use Family Tree Maker as my master repository then export that to GEDCOM files to load into this application.
 
 Collaboration and/or pull requests are welcome.
