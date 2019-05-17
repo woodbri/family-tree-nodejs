@@ -4,3 +4,8 @@ media/woodbridge
 data
 node_modules
 test-query
+archive
+graphData.json
+test.db
+mayflower-ancestors.txt
+some-search-results.txt

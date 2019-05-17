@@ -86,8 +86,10 @@ To load a GEDCOM file, run these commands and then edit mygedcom.cfg (see below 
 
 ```
 bin/load-gedcom < path/to/mygedcom.ged
+bin/build-graphdb
 mkdir -p db/mygedcom
 mv test.db db/mygedcom/mygedcom.db
+mv graphdb.json db/mygedcom/mygedcom.json
 cp sample-db.cfg db/mygedcom/mygedcom.cfg
 cp sample-db.about db/mygedcom/mygedcom.about
 ```
@@ -105,20 +107,23 @@ with an updated GEDCOM when you have photos linked to the GEDCOM file.
 ```
 cp db/<dbname>/<dbname>.db test.db
 bin/load-gedcom < path/to/mygedcom.ged
+bin/build-graphdb
 mv test.db db/<dbname>/<dbname>.db
+mv graphdb.json db/<dbname>/<dbname>.json
 ```
 
 The first command copies your existing database with the photo tables in it. Then the next command
 drops the genealogy tables only leaving the photos in place and reloads the genealogy tables
-from the GEDCOM. Family the last command moves the updated test.db back into place and you should
-have both the new genealogy data and you existing photo tables.
+from the GEDCOM. The last two command moves the updated test.db back into place and you should
+have both the new genealogy data and you existing photo tables and moves the new graph database
+in place.
 
 ### Integrating Photos with your Genealogy Data
 
 This code currently does not support GEDCOM 5.5 support for media links. This could be
-added in the future. For now there is a photo management system included if you turn it
+added in the future. For now there is a photo management system included if you turn it on
 in ``db-config.js`` by setting ``hasPhotos: true``. This enable a ``Photos`` link on the
-main menu bar. From here you users logged in with admin rights can upload photos, link
+main menu bar. From here your users logged in with admin rights can upload photos, link
 them to individuals, view them and edit attributes associated with the photos.
 
 ### Configuring Databases in the Server
@@ -224,6 +229,36 @@ var dbConfig = {
 };
 ```
 
+### Using find-relationship
+
+Find-relationship searches the graph database version of your gedcom file to find a path
+from one individual to another. The command runs like:
+
+```
+Usage: find-relationship database indi_from indi_to
+```
+
+as in this example:
+
+```
+$ bin/find-relationship woodbridge I0169 I2825
+find-relationship:  { iter: 5619,
+  distance: 12,
+  path:
+   [ { indi: 'I0169', name: 'Stephen Eliot Woodbridge' },
+     { indi: 'I2788', name: 'Joseph Eliot Woodbridge' },
+     { indi: 'I3365', name: 'Donald Eliot Woodbridge' },
+     { indi: 'I0002', name: 'Joseph Lester Woodbridge' },
+     { indi: 'I1857', name: 'Irene Augusta Cartwright' },
+     { indi: 'I2792', name: 'David Gardner Cartwright' },
+     { indi: 'I2796', name: 'Thomas Cartwright' },
+     { indi: 'I2798', name: 'Benjamin Cartwright' },
+     { indi: 'I2801', name: 'Hezadiah Cartwright' },
+     { indi: 'I2816', name: 'Bethia Pratt' },
+     { indi: 'I2819', name: 'Joseph Pratt' },
+     { indi: 'I2823', name: 'Mary Priest' },
+     { indi: 'I2825', name: 'Degory Priest' } ] }
+```
 
 ## File Structure
 

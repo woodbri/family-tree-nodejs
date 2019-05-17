@@ -1,0 +1,179 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var async = require("async");
+var anyDB = require('any-db');
+
+var pool = anyDB.createPool({
+    adapter: 'sqlite3',
+    database: './test.db'
+});
+
+
+const gData = { graph: {}, names: {} };
+const fami = {};
+
+const saveGraphData = (data, path) => {
+    try {
+        fs.writeFileSync(path, JSON.stringify(data));
+    }
+    catch (err) {
+        console.error(err);
+    }
+}
+
+
+function loadFami(next) {
+    pool.acquire(function(err, conn) {
+        console.log('loadFami ----------------');
+        if (err) {
+            console.error(err);
+            next(err);
+        }
+        var sql = 'select fami, husb, wife from fami';
+        conn.query(sql, [], function(err, results) {
+            if (err) {
+                console.error(err);
+                pool.release(conn);
+                next(err);
+            }
+            console.log('loadFami: ' + results.rowCount);
+            results.rows.forEach(function(r) {
+                var triples = [];
+                if (r.HUSB) {
+                    triples.push({
+                        subject: r.FAMI,
+                        predicate: 'parent',
+                        object: r.HUSB,
+                    });
+                    triples.push({
+                        subject: r.HUSB,
+                        predicate: 'marriage',
+                        object: r.FAMI,
+                    });
+                }
+                if (r.WIFE) {
+                    triples.push({
+                        subject: r.FAMI,
+                        predicate: 'parent',
+                        object: r.WIFE,
+                    });
+                    triples.push({
+                        subject: r.WIFE,
+                        predicate: 'marriage',
+                        object: r.FAMI,
+                    });
+                }
+                if (r.HUSB && r.WIFE) {
+                    gData.graph[r.HUSB][r.WIFE] = 's';
+                    gData.graph[r.WIFE][r.HUSB] = 's';
+                }
+                fami[r.FAMI] = [r.HUSB, r.WIFE];
+
+            });
+            pool.release(conn);
+            next(null, 'loadFami');
+        });
+    });
+}
+
+function loadChild(next) {
+    pool.acquire(function(err, conn) {
+        console.log('loadChild ----------------');
+        if (err) {
+            console.error(err);
+            next(err);
+        }
+        var sql = 'select fami, seq, indi from child';
+        conn.query(sql, [], function(err, results) {
+            if (err) {
+                console.error(err);
+                pool.release(conn);
+                next(err);
+            }
+            console.log('loadChild: ' + results.rowCount);
+            results.rows.forEach(function(r) {
+                var triples = [];
+                triples.push({
+                    subject: r.INDI,
+                    predicate: 'child_of',
+                    object: r.FAMI,
+                    data: { seq: r.SEQ },
+                });
+                triples.push({
+                    subject: r.FAMI,
+                    predicate: 'has_child',
+                    object: r.INDI,
+                    data: { seq: r.SEQ },
+                });
+                let parents = fami[r.FAMI];
+                if (parents) {
+                    for (let p of parents) {
+                        if (p) {
+                            gData.graph[r.INDI][p] = 'p';
+                            gData.graph[p][r.INDI] = 'c';
+                        }
+                    }
+                }
+            });
+            pool.release(conn);
+            next(null, 'loadChild');
+        });
+    });
+}
+
+function loadIndi(next) {
+    pool.acquire(function(err, conn) {
+        console.log('loadIndi -----------------');
+        if (err) {
+            console.error(err);
+            next(err);
+        }
+        var sql = 'select * from indi';
+        conn.query(sql, [], function(err, results) {
+            if (err) {
+                console.error(err);
+                pool.release(conn);
+                next(err);
+            }
+            console.log('loadIndi: ' + results.rowCount);
+            results.rows.forEach(function(r) {
+                var triples = [];
+                triples.push({
+                    subject: r.INDI,
+                    predicate: 'info',
+                    object: [r.FNAME, r.LNAME].join(' '),
+                    data: {
+                        lname: r.LNAME,
+                        fname: r.FNAME,
+                        title: r.TITLE,
+                        sex: r.SEX,
+                        bdate: r.BDATE,
+                        ddate: r.DDATE,
+                        famc: r.FAMC,
+                    },
+                });
+                gData.graph[r.INDI] = {};
+                gData.names[r.INDI] = [r.FNAME, r.LNAME].join(' ');
+            });
+            pool.release(conn);
+            next(null, 'loadChild');
+        });
+    });
+}
+
+
+function saveGraph(err, results) {
+    pool.close();
+    saveGraphData(gData, 'graphdb.json');
+}
+
+
+async.series([
+    loadIndi,
+    loadFami,
+    loadChild,
+    ],
+    saveGraph
+);
+

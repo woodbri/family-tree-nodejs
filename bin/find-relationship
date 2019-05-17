@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+
+// Adapted from: https://hackernoon.com/how-to-implement-dijkstras-algorithm-in-javascript-abdfd1702d04
+
+var fs = require('fs');
+
+
+const loadGraphData = (path) => {
+    try {
+        return JSON.parse(fs.readFileSync(path, 'utf8'));
+    }
+    catch (err) {
+        console.error(err);
+        return false;
+    }
+}
+
+const mapCosts = {
+    c: 1,   // cost to move to a child of the current node
+    p: 1,   // cost to move to a parent of the current node
+    s: 1    // cost to move to a spouse of the current node
+};
+
+const findLowestCostNode = (costs, processed) => {
+  const knownNodes = Object.keys(costs)
+  
+  const lowestCostNode = knownNodes.reduce((lowest, node) => {
+      if (lowest === null && !processed.includes(node)) {
+        lowest = node;
+      }
+      if (costs[node] < costs[lowest] && !processed.includes(node)) {
+        lowest = node;
+      }
+      return lowest;
+  }, null);
+
+  return lowestCostNode
+};
+
+// function that returns the minimum cost and path to reach Finish
+const dijkstra = (graph, source, target) => {
+
+  // track lowest cost to reach each node
+  const trackedCosts = {};
+  trackedCosts[target] = Infinity;
+  for (let child in graph[source]) {
+      trackedCosts[child] = mapCosts[graph[source][child]];
+  }
+  //console.log('Initial `costs`: ');
+  //console.log(graph[source]);
+  //console.log(trackedCosts);
+
+  // track paths
+  const trackedParents = {};
+  trackedParents[target] = null;
+  for (let child in graph[source]) {
+    trackedParents[child] = source;
+  }
+  //console.log('Initial `parents`: ')
+  //console.log(trackedParents)
+
+  // track nodes that have already been processed
+  const processedNodes = [];
+
+  // Set initial node. Pick lowest cost node.
+  let node = findLowestCostNode(trackedCosts, processedNodes);
+  //console.log('Initial `node`: ', node)
+
+  //console.log('while loop starts: ')
+  let iter = 0;
+  while (node) {
+    iter++;
+    //console.log(`***** 'currentNode': ${node}, 'iter': ${iter} *****`)
+    let costToReachNode = trackedCosts[node];
+    let childrenOfNode = graph[node];
+  
+    for (let child in childrenOfNode) {
+      let costFromNodetoChild = mapCosts[childrenOfNode[child]]
+      let costToChild = costToReachNode + costFromNodetoChild;
+  
+      if (!trackedCosts[child] || trackedCosts[child] > costToChild) {
+        trackedCosts[child] = costToChild;
+        trackedParents[child] = node;
+      }
+
+      //console.log('`trackedCosts`', trackedCosts)
+      //console.log('`trackedParents`', trackedParents)
+      //console.log('----------------')
+    }
+  
+    processedNodes.push(node);
+
+    if (node != target) {
+        node = findLowestCostNode(trackedCosts, processedNodes);
+    }
+    else {
+        break;
+    }
+  }
+  //console.log('while loop ends: ')
+
+  let optimalPath = [target];
+  let parent = trackedParents[target];
+  while (parent) {
+    optimalPath.push(parent);
+    if (parent == source) {
+        break;
+    }
+    parent = trackedParents[parent];
+  }
+  optimalPath.reverse();
+
+  const results = {
+    iter: iter,
+    distance: trackedCosts[target],
+    path: optimalPath.map( (x) => { return {'indi': x, 'name': gData.names[x]} } )
+  };
+
+  return results;
+};
+
+// -------------- main -----------------------
+
+var argv = process.argv.slice(2);
+
+function Usage() {
+    console.log('Usage: find-relationship database indi_from indi_to');
+    process.exit(0);
+}
+
+if (argv.length != 3) Usage();
+
+
+var gData = loadGraphData('db/' + argv[0] + '/' + argv[0] + '.json');
+console.log('find-relationship: ', dijkstra(gData.graph, argv[1], argv[2]));
+
