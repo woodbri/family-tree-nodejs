@@ -210,10 +210,11 @@ function mediaListRouter(req, res, next) {
             }
             else if (id == 'all' || id == 'undefined') {
                 page = 'medialist2';
+                var list_ids = typeof req.query.list === 'undefined' ? ", '' " : ", group_concat(b.id, ',') ";
                 var sql = `select a.indi, lname, fname, living,
                         '(' || coalesce(bdate, '_____') || ' - '
                             || coalesce(ddate, '_____') || ')' as dates,
-                        count(id) as photo_cnt
+                        count(id) as photo_cnt` + list_ids + ` as list
                     from indi a join indi_photos b on a.indi=b.indi
                     group by a.indi, lname, fname, living, dates
                     order by upper(lname), upper(fname) `;
@@ -226,12 +227,14 @@ function mediaListRouter(req, res, next) {
 
                     if (results && results.rowCount > 0) {
                         results.rows.forEach(function(r) {
+                            let list = r.list.split(',').sort((a,b)=>{return parseInt(a)-parseInt(b);}).join(', ');
                             rows.push({
                                 indi: r.INDI,
                                 name: r.LNAME + ', ' + r.FNAME,
                                 presumed: r.LIVING && ! isLogin,
                                 dates: r.dates,
-                                photo_cnt: r.photo_cnt
+                                photo_cnt: r.photo_cnt,
+                                photo_list: list
                             });
                         });
                     }

@@ -1,20 +1,45 @@
-<table align="center" width="98%" border="0" cellpadding="2"><tr><td>
-
+<style>
+table#list {
+    border-collapase: collapse;
+}
+table#list tr td {
+    border-bottom: 1px solid #ccc;
+}
+table#list tr td p {
+    font-size: 11px;
+    padding: 0;
+    margin: 0;
+}
+</style>
+<table align="center" width="98%" border="0" cellpadding="2">
+<tr><td align="right">
+<form method="get">
+<input type="checkbox" {{#if query.list}}checked{{/if}} name="list">Show Ids
+<input type="submit" value="Update">
+</form>
+</td></tr>
+<tr><td>
 <h2>{{header}}</h2>
 
-<table cellpadding="2" cellspacing="0">
-<tr>
+<table id="list" cellpadding="2">
+<tr cellspacing="0">
 <th>Indi Id</th>
 <th>Name</th>
 <th>Dates</th>
 <th>Photo Count</th>
+{{#if query.list}}
+<th width="50%">Photo Ids</th>
+{{/if}}
 </tr>
 {{#each rows}}
-<tr>
+<tr cellspacing="0">
 <td valign="top">{{this.indi}}</td>
 <td valign="top"><a href="/{{../dbName}}/indi/{{this.indi}}">{{this.name}}</a></td>
 <td valign="top">{{this.dates}}</td>
 <td valign="top" align="center"><a href="/{{../dbName}}/media/list/indi/{{this.indi}}">{{this.photo_cnt}}</a></td>
+{{#if ../query.list}}
+<td valign="top"><p>{{this.photo_list}}</p></td>
+{{/if}}
 </tr>
 {{/each }}
 
