@@ -9,10 +9,10 @@
     "any-db": "^2.2.1",
     "any-db-pool": "^2.2.0",
     "any-db-sqlite3": "^2.1.4",
-    "async": "^2.6.1",
+    "async": "^2.6.4",
     "cookie-parser": "~1.4.3",
     "debug": "~4.1.0",
-    "express": "~4.16.0",
+    "express": "^4.18.2",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
     "formidable": "^1.2.1",
@@ -24,6 +24,6 @@
     "morgan": "~1.9.0",
     "node-htmlencode": "0.0.1",
     "nodemailer": "^4.7.0",
-    "sharp": "^0.21.0"
+    "sharp": "^0.31.3"
   }
 }
