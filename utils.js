@@ -51,6 +51,13 @@ function getHeaderInfo(req) {
         headerInfo['isLogin'] = false;
     }
 
+    if (req.session && req.session.last) {
+        headerInfo['last'] = req.session.last;
+    }
+    else {
+        headerInfo['last'] = '';
+    }
+
     return headerInfo;
 }
 

@@ -11,6 +11,7 @@ function indiRouter(req, res, next) {
     var pool = require('../db-config').createConnection(dbName);
 
     var indi = req.params.indi;
+    req.session.last = indi;
 
     var indiRes = {
         indi: indi,

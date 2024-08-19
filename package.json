@@ -24,6 +24,7 @@
     "morgan": "~1.9.0",
     "node-htmlencode": "0.0.1",
     "nodemailer": "^4.7.0",
-    "sharp": "^0.21.0"
+    "sharp": "^0.33.5",
+    "sqlite3": "^5.1.7"
   }
 }

@@ -31,12 +31,20 @@
     <a href="/{{dbName}}/help" title="Click here for more info ...">Help</a>
     &nbsp;&nbsp;|&nbsp;&nbsp;
     <a href="/{{dbName}}/surnames" title="Click here for Surnames ...">Surnames</a>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+{{#compare last "==" ""}}
+    Person
+{{else}}
+    <a href="/{{dbName}}/indi/{{last}}" title="Click here to see person details ...">Person</a>
+{{/compare}}
 {{else}}
     About
     &nbsp;&nbsp;|&nbsp;&nbsp;
     Help
     &nbsp;&nbsp;|&nbsp;&nbsp;
     Surnames
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    Person
 {{/if}}
     &nbsp;&nbsp;|&nbsp;&nbsp;
 {{#if indi.indi}}

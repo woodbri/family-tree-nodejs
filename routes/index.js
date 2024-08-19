@@ -4,6 +4,7 @@ var getHeaderInfo = require('../utils');
 
 /* GET home page. */
 function indexRouter(req, res, next) {
+    req.session.last = '';
     res.locals = getHeaderInfo(req) || {};
     var list = [];
     for (var dbname in dbs) {
