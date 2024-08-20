@@ -1,9 +1,10 @@
 var createError = require('http-errors');
-var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var expressHbs = require('express-handlebars');
+
+var express = require('express');
+var handlebars = require('express-handlebars');
 
 var indexRouter = require('./routes/index');
 var homeRouter = require('./routes/home');
@@ -33,7 +34,7 @@ var mediaSummaryRouter = require('./routes/mediasummary');
 var mediaGroupsPostRouter = require('./routes/mediagroupspost');
 var getGroupsRouter = require('./routes/getgroups');
 
-var app = express();
+const app = express();
 var session = require('express-session');
 
 app.use(session({
@@ -43,12 +44,12 @@ app.use(session({
 }));
 
 // view engine setup
-app.engine('.hbs', expressHbs({
+app.set('view engine', 'hbs');
+app.engine('hbs', handlebars.engine({
     defaultLayout: 'layout',
-    extname: '.hbs',
+    extname: 'hbs',
     helpers: require('./public/javascripts/helpers.js').helpers
 }));
-app.set('view engine', '.hbs');
 
 app.use(logger('dev'));
 app.use(express.json());
