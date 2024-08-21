@@ -14,6 +14,7 @@
 
 <title>{{title}}</title>
 <link rel='stylesheet' href='/stylesheets/style.css'/>
+<link rel='stylesheet' media="print" href='/stylesheets/print.css'/>
 
 <link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32" />
 <link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16" />
@@ -22,8 +23,8 @@
 </head>
 <body>
     <h1 align=center><a href="/{{dbName}}/">{{title}}</a></h1>
-<table class=tableback width="99%" border=0 cellspacing=0 cellpadding=1 align=center><tr><td>
-<table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3><tr>
+<table class="tableback hide-on-print" width="99%" border=0 cellspacing=0 cellpadding=1 align=center><tr><td>
+<table class="tablelite hide-on-print" width="100%" border=0 cellspacing=0 cellpadding=3><tr>
 <td align=center>
 {{#if dbName}}
     <a href="/{{dbName}}/about" title="Click here for more info ...">About</a>

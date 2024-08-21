@@ -1,0 +1,52 @@
+* {
+    background-image: none !important;
+    background-color: white;
+    color: black;
+  }
+
+  body {
+    background-color: white;
+    color: black;
+    font-size: 12pt;
+    font-family: Arial, sans-serif;
+}
+
+.hide-on-print {
+    display: none !important;
+}
+
+a, a:visited { color: #000 !important; text-decoration: none; }
+
+h2 {
+    background-color: white;
+    color:black;
+}
+
+pre {
+    break-inside: avoid;
+}
+
+/* target all pages */
+@page {
+  margin: 2cm;
+}
+
+.borders {
+    border: solid black !important;
+    border-width: 1px !important;
+
+}
+/* target the first page only */
+@page :first {
+  margin-top: 1cm;
+}
+
+/* target left (even-numbered) pages only */
+@page :left {
+  margin-right: 4cm;
+}
+
+/* target right (odd-numbered) pages only */
+@page :right {
+  margin-left: 4cm;
+}

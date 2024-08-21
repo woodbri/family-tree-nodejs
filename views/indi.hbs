@@ -5,7 +5,7 @@
 <table align="center" width="98%" border="0" cellpadding="2">
 <tr>
 <td valign="top" width="75%">
-<h2>{{lname}}, {{fname}}</h2>
+<h2 class="borders">{{lname}}, {{fname}}</h2>
 <p>
 {{#if note}}
 [<a href="/{{../dbName}}/notes/{{note}}_{{indi}}">NOTES</a>] 
@@ -73,7 +73,7 @@
  <td valign=top width="25%">
  <table align=center cellspacing="3" cols="3">
  <tr>
- <td colspan=3 align=center>Click images to enlarge</td>
+ <td class="hide-on-print" colspan=3 align=center>Click images to enlarge</td>
  </tr>
  {{#each photos as |row|}}
  <tr>
@@ -108,7 +108,7 @@
  <table class=tableback width="99%" border=0 cellspacing=0 cellpadding=1 valign=center align=center>
    <tr><td>
      <table class=tablelite width="100%" border=0 cellspacing=0 cellpadding=3>
-       <tr><td align=center>Pedigree</td></tr>
+       <tr><td class="borders" align=center>Pedigree</td></tr>
      </table>
  </td></tr>
  </table>
