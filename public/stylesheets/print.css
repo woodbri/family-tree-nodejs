@@ -34,8 +34,8 @@ pre {
 .borders {
     border: solid black !important;
     border-width: 1px !important;
-
 }
+
 /* target the first page only */
 @page :first {
   margin-top: 1cm;

@@ -8,8 +8,8 @@
 var DEBUG = false;
 var VERBOSE = true;
 
-var gedcom = require('../parse-gedcom'),
-    concat = require('concat-stream');
+var gedcom = require('../parse-gedcom');
+var concat = require('concat-stream');
 
 var metaphone = require('metaphone');
 
@@ -69,6 +69,10 @@ process.stdin.pipe(concat(function(buf) {
     if (input.charCodeAt(0) == 65279) input = input.substring(1);
     var ged = gedcom.parse(input);
 
+    if (DEBUG) {
+        console.log(JSON.stringify(ged, null, 2));
+    }
+
     conn.query('BEGIN');
     loadGedcom(conn, ged);
     conn.query('COMMIT');
@@ -96,6 +100,7 @@ function mapTag(tag) {
       "SEX": 'Sex',
       "BIRT": 'Birth',
       "DEAT": 'Death',
+      "BURI": 'Buried',
       // "FAMS": 'Family of spouse',
       // "FAMC": 'Family of child',
       "NOTE": 'Note',
@@ -137,6 +142,7 @@ function mapTag(tag) {
 
     var t = tags[tag];
     if (typeof tags[tag] === 'undefined') {
+        console.log('### Missing tag: ' + tag);
         t = tag.toLowerCase();
     }
 

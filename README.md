@@ -9,6 +9,32 @@ This was built to work with my GEDCOM files and it might need changes and/or add
 
 Collaboration and/or pull requests are welcome.
 
+## ISSUES
+
+The loading of NOTE and probably SOUR ged records needs to be reviewed, for how they are loaded and dumped. I'm see records like:
+
+```
+0 @NS247761@ NOTE The original ownership of this Bible is uncertain.  The earliest handwriting does not match that of Christoph Friederich Klett (Frederick, Sr.), and has yet to be identified.  Several entries are in t
+1 CONC he same hand, which suggests that the events were recorded all at once and not as they happened.  Other events in varying handwriting styles appear to have been entered at different times, whether the
+1 CONC se records were entered at the time of the event or later has not been established with any certainty.
+
+0 @S24776@ SOUR
+1 ABBR Klett Family Bible
+1 TITL <i>Klett Family Bible</i>
+1 _SUBQ <i>Klett Family Bible</i>
+1 _BIBL <i>Klett Family Bible</i>.
+1 NOTE The original ownership of this Bible is uncertain.  The earliest handwr
+2 CONC iting does not match that of Christoph Friederich Klett (Frederick, Sr.
+2 CONC ), and has yet to be identified.  Several entries are in the same hand, w
+2 CONC hich suggests that the events were recorded all at once and not as they h
+2 CONC appened.  Other events in varying handwriting styles appear to have bee
+2 CONC n entered at different times, whether these records were entered at the t
+2 CONC ime of the event or later has not been established with any certainty.
+```
+
+Also RootsMagic puts a LOT of tags that are not in the original Family Tree Maker GED files that were used when this was originally written, so some additional thought needs to go into handling them.
+
+
 ## Installation
 
 ### Package Dependencies

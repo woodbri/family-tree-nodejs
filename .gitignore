@@ -1,6 +1,7 @@
 db/woodbridge
 db/woodbridge_record
 media/woodbridge
+build
 data
 node_modules
 test-query

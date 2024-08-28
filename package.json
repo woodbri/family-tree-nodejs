@@ -7,9 +7,10 @@
   },
   "dependencies": {
     "any-db": "^2.2.1",
-    "any-db-pool": "^2.3.0",
-    "any-db-sqlite3": "^2.3.0",
+    "any-db-pool": "^2.2.0",
+    "any-db-sqlite3": "^2.1.4",
     "async": "^3.2.6",
+    "concat-stream": "^2.0.0",
     "cookie-parser": "~1.4.3",
     "debug": "^4.3.6",
     "express": "^4.19.2",
@@ -20,11 +21,13 @@
     "hbs": "^4.2.0",
     "http-errors": "~2.0.0",
     "json2csv": "^6.0.0-alpha.2",
-    "metaphone": "^2.0.1",
+    "metaphone": "^1.0.6",
     "morgan": "~1.10.0",
+    "node-gyp": "^10.2.0",
     "node-htmlencode": "0.0.1",
     "nodemailer": "^6.9.14",
     "sharp": "^0.33.5",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "traverse": "^0.6.9"
   }
 }
