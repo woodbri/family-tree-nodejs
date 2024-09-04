@@ -17,7 +17,7 @@
 
 <ul>
 {{#each events as |e|}}
-<li><I>{{e.etype}}: </I>{{#if e.date}}{{e.date}}{{/if}}{{#if e.place}} - {{e.place}}{{/if}}{{#if e.note}} [<a href="/{{../dbName}}/{{e.note}}">[Note]</a>]{{/if}}
+<li><I>{{e.etype}}: </I>{{#if e.date}}{{e.date}}{{/if}}{{#if e.place}} - {{e.place}}{{/if}}{{#if e.note}} [<a href="/{{../dbName}}/{{e.note}}">[Note]</a>]{{/if}}{{#if e.text}} - {{e.text}}{{/if}}
 {{/each}}
 {{#each stats as |s|}}
 {{#if s.data}}
@@ -45,7 +45,7 @@
 {{#if fam.spouse.presumed}}{{else}}
  <ul>
 {{#each fam.events as |evt|}}
- <li><I>{{evt.etype}}: </I>{{#if evt.date}}{{evt.date}}{{/if}} - {{#if evt.place}}{{evt.place}}{{/if}}
+ <li><I>{{evt.etype}}: </I>{{#if evt.date}}{{evt.date}}{{/if}}{{#if evt.place}} - {{evt.place}}{{/if}}
 {{/each}}
  </ul>
  {{/if}}

@@ -185,10 +185,29 @@ def outputNotes(cur, cur2, writer):
 
 def outputSour(cur, writer):
     dprint('outputSour')
+    # table fields: sour, titl, auth, publ, repo
+    sql = 'select * from sour order by sour ' + limit
+    for row in cur.execute(sql):
+        writer.write(f'0 @{row["SOUR"]}@ SOUR' + '\n')
+        if (row['TITL'] is not None):
+            writer.write(f'1 TITL {row["TITL"]}' + '\n')
+        if (row['AUTH'] is not None):
+            writer.write(f'1 AUTH {row["AUTH"]}' + '\n')
+        if (row['PUBL'] is not None):
+            writer.write(f'1 PUBL {row["PUBL"]}' + '\n')
+        if (row['REPO'] is not None):
+            if (row['REPO'][0:8] == 'NOTE: @'):
+                writer.write('1 REPO\n')
+                writer.write('2 NOTE @' + row['REPO'][8:-1] + '@\n')
 
 
 def outputRepo(cur, writer):
     dprint('outputRepo')
+    # TODO
+    # we don't currently support REPO as a level 0 record
+    # it is handled via SOUR table and a 'NOTE: @NSnnnnn@' in the REPO field
+    # RootsMagic does use '0 @Rnn@ REPO' which we'll need to deal with
+    # in addition to a lot of custom tags
 
 
 def outputTrlr(cur, writer):

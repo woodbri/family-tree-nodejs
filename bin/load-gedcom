@@ -6,6 +6,7 @@
 */
 
 var DEBUG = false;
+DEBUG = true;
 var VERBOSE = true;
 
 var gedcom = require('../parse-gedcom');
@@ -24,7 +25,7 @@ var dbURL;
 switch (useDB) {
     case 'postgresql':
         // npm install any-db-postgres any-db
-        anyDB = require('any-db-postgres');
+        //anyDB = require('any-db-postgres');
         dbURL = 'postgresql://test:test@192.168.99.100:5432/test';
         break;
     case 'sqlite3':
@@ -46,7 +47,7 @@ switch (useDB) {
         break;
     case 'mysql':
         // npm install any-db-mysql any-db
-        anyDB = require('any-db-mysql');
+        //anyDB = require('any-db-mysql');
         dbURL = 'mysql://test:test@192.168.99.100:3307/test';
         break;
     default:
@@ -103,6 +104,8 @@ function mapTag(tag) {
       "BURI": 'Buried',
       // "FAMS": 'Family of spouse',
       // "FAMC": 'Family of child',
+      "DATE": 'Date',
+      "PLAC": 'Place',
       "NOTE": 'Note',
       "REFN": 'Reference',
       "TITL": 'Title',
@@ -158,20 +161,20 @@ function mapTag(tag) {
 * param: ged   - gedcom tree produced by parse-gedcom
 */
 function loadGedcom(conn, ged) {
-var indi = 0;
-var fam = 0;
-var note = 0;
-var sour = 0;
+    var indi = 0;
+    var fam = 0;
+    var note = 0;
+    var sour = 0;
 
-for (i in ged) {
-    item = ged[i];
-    switch (item.tag) {
-        case 'INDI':
-            loadIndi(conn, item);
-            indi++;
-            break;
-        case 'FAM':
-            loadFam(conn, item);
+    for (i in ged) {
+        item = ged[i];
+        switch (item.tag) {
+            case 'INDI':
+                loadIndi(conn, item);
+                indi++;
+                break;
+            case 'FAM':
+                loadFam(conn, item);
                 fam++;
                 break;
             case 'NOTE':
@@ -413,6 +416,9 @@ function getEvent(item, refid) {
 function makeEvent(item, refid) {
     var event = { 'refid': refid };
     event['etype'] = mapTag(item.tag);
+    if (event['etype'] == 'Alias' && item.data) {
+        event['text'] = item.data;
+    }
 
     var tree = item.tree;
     for (i in tree) {
@@ -621,8 +627,8 @@ function loadIndi(conn, item) {
         var rec = [
             indi.indi,
             ((typeof evt.etype === 'undefined') ? null : evt.etype),
-            ((typeof evt.date === 'undefined') ? null : evt.date),
-            ((typeof evt.plac === 'undefined') ? null : evt.plac),
+            ((typeof evt.Date === 'undefined') ? null : evt.Date),
+            ((typeof evt.Place === 'undefined') ? null : evt.Place),
             ((typeof evt.note === 'undefined') ? null : evt.note),
             ((typeof evt.text === 'undefined') ? null : evt.text),
             ((typeof evt.edate === 'undefined') ? null : evt.edate)
@@ -735,6 +741,9 @@ function loadNote(conn, item) {
     var nid = cleanPointer(item.pointer);
     var sql_note = 'INSERT INTO notes (note, text) VALUES (?, ?)';
 
+    if (item.data) {
+        conn.query(sql_note, [nid, item.data]);
+    }
     if (useTextForNotes) {
         var rec = '';
         for (i in item.tree) {
@@ -743,7 +752,7 @@ function loadNote(conn, item) {
                 rec += line.data;
             }
             else if (line.tag == 'CONT') {
-                conn.query(sql_note, [nid, rec]);
+                if (rec.length) conn.query(sql_note, [nid, rec]);
                 rec = line.data;
             }
             else {
@@ -798,17 +807,29 @@ function loadSour(conn, item) {
                 }
                 break;
             case 'REPO':
-                if (item.tree[i].tree[0].tag == 'NOTE') {
-                    rec[4].push('NOTE: ' + item.tree[i].tree[0].data);
-                }
-                else if (item.tree[i].tree[0].tag == 'CALN') {
-                    rec[4].push('Medium: ' + item.tree[i].tree[0].data);
-                }
-                else {
-                    console.log('WARNING: unknown tag (' + item.tree[i].tree[0].tag + ')');
-                    console.log(JSON.stringify(item, null, 2));
+                for (j in item.tree[i].tree) {
+                    var jtem = item.tree[i].tree[j];
+                    switch (jtem.tag) {
+                        case 'NOTE':
+                            rec[4].push('NOTE: ' + jtem.data);
+                            break;
+                        case 'CALN':
+                            if (jtem.data) {
+                                rec[4].push('Call no: ' + jtem.data);
+                            }
+                            if (jtem.tree[0].tag == 'MEDI' && jtem.tree[0].data) {
+                                rec[4].push('Medium: ' + jtem.tree[0].data);
+                            }
+                            break;
+                        default:
+                            console.log('WARNING: unknown tag (' + jtem.tag + ')');
+                            console.log(JSON.stringify(jtem, null, 2));
+                    }
                 }
                 break;
+            default:
+                console.log('WARNING: unknown tag (' + item.tree[0].tag + ')');
+                console.log(JSON.stringify(item.tree[0], null, 2));
         }
     }
 
@@ -884,7 +905,7 @@ function createTables(conn, useDB) {
             [ 'TITL'  , 'varchar'  , 255, '' ],
             [ 'AUTH'  , 'varchar'  , 255, '' ],
             [ 'PUBL'  , 'varchar'  , 1024, '' ],
-            [ 'REPO'  , 'varchar'  , 255, '' ],
+            [ 'REPO'  , 'varchar'  , 1024, '' ],
             [ '', '', '', 'PRIMARY KEY (SOUR)' ]
         ],
 
