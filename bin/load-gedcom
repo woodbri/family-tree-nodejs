@@ -416,6 +416,8 @@ function getEvent(item, refid) {
 function makeEvent(item, refid) {
     var event = { 'refid': refid };
     event['etype'] = mapTag(item.tag);
+
+    // might want to do this for all tags to capture item.data
     if (event['etype'] == 'Alias' && item.data) {
         event['text'] = item.data;
     }
