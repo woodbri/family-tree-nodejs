@@ -1,9 +1,10 @@
 import createError from 'http-errors';
-import express from 'express';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
-import expressHbs from 'express-handlebars';
+
+import express from 'express';
+import handlebars from 'express-handlebars';
 
 import indexRouter from './routes/index.js';
 import homeRouter from './routes/home.js';
@@ -32,9 +33,21 @@ import mediaDeletePostRouter from './routes/mediadeletepost.js';
 import mediaSummaryRouter from './routes/mediasummary.js';
 import mediaGroupsPostRouter from './routes/mediagroupspost.js';
 import getGroupsRouter from './routes/getgroups.js';
+
+import getHeaderInfo from './utils.js';
 import session from 'express-session';
+import { helpers } from './public/javascripts/helpers.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
+
+async function loadDBConfig(dbName) {
+    const cfg = await import('./db/${dbName}/${dbName}.cfg');
+    return cfg;
+}
 
 app.use(session({
     secret: 'web-family-tree-5342aaeb',
@@ -43,10 +56,10 @@ app.use(session({
 }));
 
 // view engine setup
-app.engine('.hbs', expressHbs({
+app.engine('hbs', handlebars.engine({
     defaultLayout: 'layout',
-    extname: '.hbs',
-    helpers: require('./public/javascripts/helpers.js').helpers
+    extname: 'hbs',
+    helpers: helpers
 }));
 app.set('view engine', '.hbs');
 
@@ -84,29 +97,30 @@ app.get('/:dbName/media/summary', mediaSummaryRouter);
 app.post('/:dbName/media/groups', mediaGroupsPostRouter, getGroupsRouter);
 
 app.get('/:dbName/login', function(req, res) {
-    var getHeaderInfo = require('./utils');
     var resData = getHeaderInfo(req);
     resData['ref'] = req.query.ref;
     res.render('login', resData);
 });
 app.post('/:dbName/login', function(req, res) {
     var dbName = req.params.dbName;
-    var auth = require('./db/' + dbName + '/' + dbName + '.cfg').auth;
-    try {
-        var url = typeof req.body.ref === 'undefined' ? '/' + req.params.dbName + '/' : req.body.ref;
-        if (!req.body.username || !req.body.password) {
-            res.redirect(decodeURIComponent(url));
+    loadDBConfig(dbName).then(cfg => {
+        var auth = cfg.auth;
+        try {
+            var url = typeof req.body.ref === 'undefined' ? '/' + req.params.dbName + '/' : req.body.ref;
+            if (!req.body.username || !req.body.password) {
+                res.redirect(decodeURIComponent(url));
+            }
+            else if (auth[req.body.username].password === req.body.password) {
+                req.session.user = req.body.username;
+                req.session.admin = auth[req.body.username].admin;
+                res.redirect(decodeURIComponent(url));
+            }
         }
-        else if (auth[req.body.username].password === req.body.password) {
-            req.session.user = req.body.username;
-            req.session.admin = auth[req.body.username].admin;
-            res.redirect(decodeURIComponent(url));
+        catch (e) {
+            console.error(e);
+            res.redirect('/' + req.params.dbName);
         }
-    }
-    catch (e) {
-        console.error(e);
-        res.redirect('/' + req.params.dbName);
-    }
+    });
 });
 app.use('/:dbName/logout', function(req, res) {
     req.session.destroy();

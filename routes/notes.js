@@ -1,7 +1,6 @@
 import getHeaderInfo from '../utils.js';
 import createConnection from '../db-config.js';
-import htmlEncodeModule from 'node-htmlencode';
-const htmlEncode = htmlEncodeModule.htmlEncode;
+import { encode } from 'html-entities';
 
 /* GET notes or source listing. */
 export default function notesRouter(req, res, next) {
@@ -33,7 +32,7 @@ export default function notesRouter(req, res, next) {
                     notes.push(str);
                 }
                 else {
-                    notes.push(htmlEncode(r.TEXT));
+                    notes.push(encode(r.TEXT));
                 }
             });
             pool.release(conn);

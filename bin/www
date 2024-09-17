@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-import app from '../app.js';
-import pkg from 'debug';
-const { debugLib } = pkg;
-const debug = debugLib('family-tree-nodejs:server');
+import wwwApp from '../app.js';
+const { app } = wwwApp;
+import createDebug from 'debug';
+const debug = createDebug('family-tree-nodejs:server');
 import http from 'http';
 
 /**

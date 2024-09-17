@@ -1,5 +1,4 @@
-import htmlEncodeiModule from 'node-htmlencode';
-const htmlEncode = htmlEncodeModule.htmlEncode;
+import { encode } from 'html-entities';
 import getHeaderInfo from '../utils.js';
 import createConnection from '../db-config.js';
 
@@ -38,11 +37,11 @@ export default function sourceRouter(req, res, next) {
                     stype: r.stype,
                     indi: r.INDI,
                     name: r.LNAME + ', ' + r.FNAME,
-                    text: htmlEncode(r.TEXT),
-                    titl: htmlEncode(r.TITL),
-                    auth: htmlEncode(r.AUTH),
-                    publ: htmlEncode(r.PUBL),
-                    repo: htmlEncode(r.REPO)
+                    text: encode(r.TEXT),
+                    titl: encode(r.TITL),
+                    auth: encode(r.AUTH),
+                    publ: encode(r.PUBL),
+                    repo: encode(r.REPO)
                 });
             });
 

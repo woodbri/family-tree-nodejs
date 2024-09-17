@@ -76,5 +76,3 @@ export default function mediaGroupsPostRouter(req, res, next) {
     }
 }
 
-module.exports = mediaGroupsPostRouter;
-

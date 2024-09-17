@@ -1,7 +1,6 @@
 import getHeaderInfo from '../utils.js';
 import createConnection from '../db-config.js';
-import htmlEncodeModule from 'node-htmlencode';
-const htmlEncode = htmlEncodeModule.htmlEncode;
+import { encode } from 'html-entities';
 import async from 'async';
 import { metaphone } from 'metaphone';
 
@@ -336,8 +335,8 @@ export default function searchRouter(req, res, next) {
                         var aa = [r.TITL, r.AUTH, r.PUBL, r.REPO].join('; ');
                         data.sources.push(
                             linkName(r) + ' - <a href="/' + dbName + '/source/' +
-                                r.SEQ + '">' + htmlEncode(r.TEXT) + '</a> - ' +
-                                htmlEncode(aa)
+                                r.SEQ + '">' + encode(r.TEXT) + '</a> - ' +
+                                encode(aa)
                         );
                     }
                 });
