@@ -1,9 +1,13 @@
-var fs = require('fs');
-var path = require('path');
-var getHeaderInfo = require('../utils');
+import fs from 'fs';
+import path from 'path';
+import getHeaderInfo from '../utils.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /* GET About */
-function homeRouter(req, res, next) {
+export default function homeRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var temp = path.join(__dirname, '..', 'db', req.params.dbName, req.params.dbName + '.about');
     fs.readFile(temp, function(err, data) {
@@ -16,6 +20,4 @@ function homeRouter(req, res, next) {
         res.render('home');
     });
 };
-
-module.exports = homeRouter;
 

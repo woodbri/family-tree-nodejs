@@ -1,15 +1,16 @@
-var async = require('async');
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+import async from 'async';
 
 function mediaSummaryRouter(req, res, next) {
 
-    var getHeaderInfo = require('../utils');
     res.locals = getHeaderInfo(req) || {};
     var isAdmin = res.locals.isAdmin;
     var isLogin = res.locals.isLogin;
     var dbName = req.params.dbName;
     var hasPhotos = res.locals.hasPhotos;
 
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     async.parallel([
         count_indi,
@@ -129,6 +130,4 @@ function mediaSummaryRouter(req, res, next) {
     }
 
 }
-
-module.exports = mediaSummaryRouter;
 

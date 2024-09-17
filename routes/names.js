@@ -1,20 +1,21 @@
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
 
-var getHeaderInfo = require('../utils');
-var async = require('async');
+import async from 'async';
 
 /* GET names for surname listing. */
 
-function namesRouter(req, res, next) {
+export default function namesRouter(req, res, next) {
 
     res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
     var useDB = pool.adapter;
 
     function getDates(dbName, row, idx) {
         return new Promise(async function(resolve, reject) {
             try {
-                var pool2 = await require('../db-config').createConnection(dbName);
+                var pool2 = await createConnection(dbName);
                 pool2.acquire(function(err, conn) {
                     var sql2 = `select a.indi, 
                             '(' || coalesce(b.date, '_______') || ' - ' || coalesce(c.date, '_______') || ')' as dates
@@ -105,5 +106,4 @@ function namesRouter(req, res, next) {
     });
 }
 
-module.exports = namesRouter;
 

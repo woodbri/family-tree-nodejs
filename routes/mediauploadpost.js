@@ -1,3 +1,9 @@
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+
+import formidable from 'formidable';
+import fs from 'fs';
+import sharp from 'sharp';
 
 const fileext = {
     jpeg: '.jpg',
@@ -8,9 +14,8 @@ const fileext = {
     svg: '.svg'
 };
 
-var getHeaderInfo = require('../utils');
 
-function mediaUploadPostRouter(req, res, next) {
+export default function mediaUploadPostRouter(req, res, next) {
 
     var dbName = req.params.dbName;
     res.locals = getHeaderInfo(req) || {};
@@ -24,9 +29,6 @@ function mediaUploadPostRouter(req, res, next) {
 
     if (req.session && req.session.admin) {
         var oldpath;
-        var formidable = require('formidable');
-        var fs = require('fs');
-        var sharp = require('sharp');
         var form = new formidable.IncomingForm();
         var newid = '';
         var error = '';
@@ -77,7 +79,7 @@ function mediaUploadPostRouter(req, res, next) {
                     errorHandler('Upload failed: Unsupported type of media!', 'mediaupload');
                     return;
                 }
-                var pool = require('../db-config').createConnection(dbName);
+                var pool = createConnection(dbName);
                 pool.acquire(function(err, conn) {
                     if (err) {
                         pool.close();
@@ -160,4 +162,3 @@ function mediaUploadPostRouter(req, res, next) {
     }
 }
 
-module.exports = mediaUploadPostRouter;

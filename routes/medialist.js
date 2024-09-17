@@ -1,12 +1,14 @@
-function mediaListRouter(req, res, next) {
-    var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+
+export default function mediaListRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var isAdmin = res.locals.isAdmin;
     var isLogin = res.locals.isLogin;
     var dbName = req.params.dbName;
     var mode = req.params.mode.toLowerCase();
     var id = String(req.params.id).toLowerCase();
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
     var rows = [];
 
     function getIndisFromList(list, callback) {
@@ -361,6 +363,4 @@ function mediaListRouter(req, res, next) {
         }
     });
 }
-
-module.exports = mediaListRouter;
 

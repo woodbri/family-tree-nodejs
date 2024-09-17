@@ -1,14 +1,16 @@
-var htmlEncode = require('node-htmlencode').htmlEncode;
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+import htmlEncodeModule from 'node-htmlencode';
+const htmlEncode = htmlEncodeModule.htmlEncode;
 
 /* GET notes or source listing. */
-function notesRouter(req, res, next) {
+export default function notesRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var items = req.params.id.split('_');
     var noteId = items[0];
     var indi = items[1];
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     pool.acquire(function(err, conn) {
         if (err) console.log(err);
@@ -55,5 +57,4 @@ function notesRouter(req, res, next) {
     });
 };
 
-module.exports = notesRouter;
 

@@ -5,37 +5,33 @@
  *
 */
 
+import {createReadStream} from 'node:fs';
+
+import {metaphone} from 'metaphone';
+
+import gedcom_pkg from 'parse-gedcom';
+const {gedcom} = gedcom_pkg;
+
+import anyDB_pkg from 'any-db-sqlite3';
+const {anyDB} = anyDB_pkg;
+
+console.log('hello world');
+
 var DEBUG = false;
 var VERBOSE = true;
 
-var gedcom = require('../parse-gedcom'),
-    concat = require('concat-stream');
-
-var metaphone = require('metaphone');
-
-// Select the database you want to use and define an appropriate connection string for it
-// mysql|postgresql|sqlite3
-
-var useTextForNotes = true;
 var useDB = 'sqlite3'
-var anyDB;
-var dbURL;
 
-switch (useDB) {
-    case 'postgresql':
-        // npm install any-db-postgres any-db
-        anyDB = require('any-db-postgres');
-        dbURL = 'postgresql://test:test@192.168.99.100:5432/test';
-        break;
-    case 'sqlite3':
-        // npm install any-db-sqlite3 any-db
-        anyDB = require('any-db-sqlite3');
-        // there is a bug in any-db-sqlite3 where db urls are not parsed correctly
-        // into objects, so we have to use the object form below for sqlite3
-        // dbURL = 'sqlite3://test.db?OPEN_CREATE';
-        // dbURL = 'sqlite3://test.db?OPEN_READWRITE&OPEN_CREATE';
-        // dbURL = 'sqlite3://localhost/test.db';
-        dbURL = {
+
+if (process.argv.length === 2) {
+	console.error('Usage: load-gedcom file.ged');
+	process.exit(1);
+}
+
+const gedfile = process.argv[2];
+
+const useTextForNotes = true;
+const dbURL = {
             adapter:  'sqlite3',
             host:     '',
             port:     '',
@@ -43,31 +39,27 @@ switch (useDB) {
             user:     '',
             password: ''
         };
-        break;
-    case 'mysql':
-        // npm install any-db-mysql any-db
-        anyDB = require('any-db-mysql');
-        dbURL = 'mysql://test:test@192.168.99.100:3307/test';
-        break;
-    default:
-        throw 'Invalid database type selection! ('+useDB+')';
-        break;
-}
+
+console.log('Input ged file: ' + gedfile);
+console.log('Output DB: test.db');
+
+console.log('Connecting to database: ' + dbURL);
 
 var conn = anyDB.createConnection(dbURL);
-console.log('Connected to database: ' + dbURL);
 
-// var conn = anyDB.createPool(dbURL, {min:2, max:20})
+console.log('Connected to database: ' + dbURL);
 
 var stats = {};
 
-process.stdin.pipe(concat(function(buf) {
-    createTables(conn, useDB);
-    console.log('-- Tables created --');
 
-    var input = buf.toString();
-    if (input.charCodeAt(0) == 65279) input = input.substring(1);
-    var ged = gedcom.parse(input);
+const readStream = createReadStream(gedfile);
+
+let data = '';
+readStream.on('data', function(chunk) {
+    data += chunk;
+}).on('end', function() {
+    if (data.charCodeAt(0) == 65279) data = data.substring(1);
+    var ged = gedcom.parse(data);
 
     conn.query('BEGIN');
     loadGedcom(conn, ged);
@@ -75,11 +67,11 @@ process.stdin.pipe(concat(function(buf) {
 
     console.log('-- Gedcom Parsed --');
 
-    // console.log(JSON.stringify(stats, null, 2));
+    console.log(JSON.stringify(stats, null, 2));
 
     conn.end();
     console.log('-- Flushing Database queue --');
-}));
+});
 
 
 // ------------------------------------------------------------

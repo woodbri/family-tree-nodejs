@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var async = require("async");
-var anyDB = require('any-db');
+// var fs = require('fs');
+import fs_pkg from 'fs';
+const {fs} = fs_pkg;
+
+// var async = require("async");
+import async_pkg from 'async';
+const {async} = async_pkg;
+
+// var anyDB = require('any-db');
+import anyDB_pkg from 'any-db';
+const {anyDB} = anyDB_pkg;
 
 var pool = anyDB.createPool({
     adapter: 'sqlite3',

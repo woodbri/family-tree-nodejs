@@ -1,3 +1,6 @@
+import createConnection from '../db-config.js';
+import getHeaderInfo from '../utils.js';
+
 const fileext = {
     jpeg: '.jpg',
     png: '.png',
@@ -7,8 +10,7 @@ const fileext = {
     svg: '.svg'
 };
 
-function mediaEditRouter(req, res, next) {
-    var getHeaderInfo = require('../utils');
+export default function mediaEditRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var isAdmin = res.locals.isAdmin;
     var isLogin = res.locals.isLogin;
@@ -22,7 +24,7 @@ function mediaEditRouter(req, res, next) {
         return;
     }
 
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
     var rows = [];
     var nextID = 1;
     var prevID = 1;
@@ -191,6 +193,4 @@ function mediaEditRouter(req, res, next) {
         }
     });
 }
-
-module.exports = mediaEditRouter;
 

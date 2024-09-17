@@ -1,40 +1,40 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var expressHbs = require('express-handlebars');
+import createError from 'http-errors';
+import express from 'express';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import expressHbs from 'express-handlebars';
 
-var indexRouter = require('./routes/index');
-var homeRouter = require('./routes/home');
-var aboutRouter = require('./routes/about');
-var helpRouter = require('./routes/help');
-var surnamesRouter = require('./routes/surnames');
-var namesRouter = require('./routes/names');
-var birthdaysRouter = require('./routes/birthdays');
-var indiRouter = require('./routes/indi');
-var descendantsRouter = require('./routes/descendants');
-var notesRouter = require('./routes/notes');
-var sourceRouter = require('./routes/source');
-var searchRouter = require('./routes/search');
-var feedbackRouter = require('./routes/feedback');
-var feedbackPostRouter = require('./routes/feedbackpost');
+import indexRouter from './routes/index.js';
+import homeRouter from './routes/home.js';
+import aboutRouter from './routes/about.js';
+import helpRouter from './routes/help.js';
+import surnamesRouter from './routes/surnames.js';
+import namesRouter from './routes/names.js';
+import birthdaysRouter from './routes/birthdays.js';
+import indiRouter from './routes/indi.js';
+import descendantsRouter from './routes/descendants.js';
+import notesRouter from './routes/notes.js';
+import sourceRouter from './routes/source.js';
+import searchRouter from './routes/search.js';
+import feedbackRouter from './routes/feedback.js';
+import feedbackPostRouter from './routes/feedbackpost.js';
 // photo management routers
-var mediaUploadRouter = require('./routes/mediaupload');
-var mediaUploadPostRouter = require('./routes/mediauploadpost');
-var mediaImageRouter = require('./routes/mediaimage');
-var mediaListRouter = require('./routes/medialist');
-var mediaLinkRouter = require('./routes/medialink');
-var mediaEditRouter = require('./routes/mediaedit');
-var mediaEditPostRouter = require('./routes/mediaeditpost');
-var mediaDeleteRouter = require('./routes/mediadelete');
-var mediaDeletePostRouter = require('./routes/mediadeletepost');
-var mediaSummaryRouter = require('./routes/mediasummary');
-var mediaGroupsPostRouter = require('./routes/mediagroupspost');
-var getGroupsRouter = require('./routes/getgroups');
+import mediaUploadRouter from './routes/mediaupload.js';
+import mediaUploadPostRouter from './routes/mediauploadpost.js';
+import mediaImageRouter from './routes/mediaimage.js';
+import mediaListRouter from './routes/medialist.js';
+import mediaLinkRouter from './routes/medialink.js';
+import mediaEditRouter from './routes/mediaedit.js';
+import mediaEditPostRouter from './routes/mediaeditpost.js';
+import mediaDeleteRouter from './routes/mediadelete.js';
+import mediaDeletePostRouter from './routes/mediadeletepost.js';
+import mediaSummaryRouter from './routes/mediasummary.js';
+import mediaGroupsPostRouter from './routes/mediagroupspost.js';
+import getGroupsRouter from './routes/getgroups.js';
+import session from 'express-session';
 
-var app = express();
-var session = require('express-session');
+export default app = express();
 
 app.use(session({
     secret: 'web-family-tree-5342aaeb',
@@ -133,4 +133,3 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;

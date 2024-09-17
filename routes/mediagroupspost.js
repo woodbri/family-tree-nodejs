@@ -1,5 +1,7 @@
-function mediaGroupsPostRouter(req, res, next) {
-    var getHeaderInfo = require('../utils');
+import createConnection from '../db-config.js';
+import getHeaderInfo from '../utils.js';
+
+export default function mediaGroupsPostRouter(req, res, next) {
     var resData = getHeaderInfo(req);
     var isAdmin = resData.isAdmin;
     var isLogin = resData.isLogin;
@@ -31,7 +33,7 @@ function mediaGroupsPostRouter(req, res, next) {
                 return;
                 break;
         }
-        var pool = require('../db-config').createConnection(dbName);
+        var pool = createConnection(dbName);
         pool.acquire(function(err, conn) {
             if (err) {
                 console.error(err);

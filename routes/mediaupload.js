@@ -1,8 +1,8 @@
+import getHeaderInfo from '../utils.js';
 
 /* Display Upload form */
 function mediaUploadRouter(req, res, next) {
     if (req.session && req.session.admin) {
-        var getHeaderInfo = require('../utils');
         res.locals = getHeaderInfo(req) || {};
         if (req.query && req.query.indi) {
             res.locals['indi'] = req.query.indi;
@@ -14,6 +14,4 @@ function mediaUploadRouter(req, res, next) {
         res.redirect('/' + req.params.dbName + '/');
     }
 };
-
-module.exports = mediaUploadRouter;
 

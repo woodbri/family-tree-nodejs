@@ -1,5 +1,12 @@
+import databases from 'db-config.js';
 
-function getHeaderInfo(req) {
+async function loadMailerConfig(dbName) {
+  const module = await import(`../db/${dbName}/${dbName}.cfg`);
+  const cfg = module.mailer;
+  return cfg;
+}
+
+export default function getHeaderInfo(req) {
 
     var headerInfo = {
         // expires: ...,
@@ -16,9 +23,11 @@ function getHeaderInfo(req) {
 
     if (dbname && !dbname.match(/favicon.ico/)) {
         try {
-            dbinfo = require('./db-config.js').databases[dbname].params;
+            dbinfo = databases[dbname].params;
 
-            requireLoginForFeedback = require('./db/' + dbname + '/' + dbname + '.cfg').requireLoginForFeedback;
+            loadMailerConfig(dbname).then(cfg => {
+                requireLoginForFeedback = cfg.requireLoginForFeedback;
+	    });
         }
         catch (e) {
             console.error(e);
@@ -54,4 +63,3 @@ function getHeaderInfo(req) {
     return headerInfo;
 }
 
-module.exports = getHeaderInfo;

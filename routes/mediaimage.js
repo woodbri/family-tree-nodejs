@@ -1,11 +1,15 @@
-var fs = require('fs');
+import databases from '../db-config.js';
+import fs from 'fs';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-function mediaImageRouter(req, res, next) {
+export default function mediaImageRouter(req, res, next) {
     var dbName = req.params.dbName;
     var mode = req.params.mode;
     var file = req.params.file;
-    var dbs = require('../db-config.js');
-    if (! dbName || ! dbs.databases[dbName] ||
+    if (! dbName || ! databases[dbName] ||
         ! mode || ! mode.match(/^(orig|web|thumb)$/) ||
         ! file || ! file.match(/\.(jpg|tif|gif|png)$/)) {
         res.sendStatus(404);
@@ -22,4 +26,3 @@ function mediaImageRouter(req, res, next) {
     });
 }
 
-module.exports = mediaImageRouter;

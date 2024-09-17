@@ -1,10 +1,8 @@
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
 
 /* GET About */
-function aboutRouter(req, res, next) {
+export default function aboutRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     res.render('about');
 };
-
-module.exports = aboutRouter;
 

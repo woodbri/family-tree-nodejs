@@ -1,12 +1,14 @@
-var htmlEncode = require('node-htmlencode').htmlEncode;
-var getHeaderInfo = require('../utils');
+import htmlEncodeiModule from 'node-htmlencode';
+const htmlEncode = htmlEncodeModule.htmlEncode;
+import getHeaderInfo from '../utils.js';
+import createConnection from '..db-config.js';
 
 /* GET a source listing. */
 function sourceRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var sourceId = req.params.id;
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     pool.acquire(function(err, conn) {
         if (err) {
@@ -51,6 +53,4 @@ function sourceRouter(req, res, next) {
         pool.close();
     });
 };
-
-module.exports = sourceRouter;
 

@@ -1,14 +1,15 @@
 
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '..db-config.js';
+import async from 'async';
 
 /* GET indi listing. */
-function indiRouter(req, res, next) {
+export default function indiRouter(req, res, next) {
 
     res.locals = getHeaderInfo(req) || {};
 
-    var async = require('async');
     var dbName = req.params.dbName;
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     var indi = req.params.indi;
 
@@ -444,7 +445,6 @@ with recursive
     }
 };
 
-module.exports = indiRouter;
 
 /*
 

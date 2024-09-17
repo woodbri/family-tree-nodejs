@@ -1,11 +1,10 @@
 
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
 
 /* GET feedback. */
-function feedbackRouter(req, res, next) {
+export default function feedbackRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || [];
     res.render('feedback');
 };
 
-module.exports = feedbackRouter;
 

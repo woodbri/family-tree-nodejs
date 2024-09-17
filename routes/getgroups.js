@@ -1,8 +1,10 @@
-function getGroupsRouter(req, res, next) {
+import createConnection from '../db-config.js';
+
+export default function getGroupsRouter(req, res, next) {
     if (! req.app.locals) req.app['locals'] = {};
     if (! req.app.locals.pgroups) {
         req.app.locals['pgroups'] = [{id: 0, desc:  'Ungrouped Photo'}];
-        var pool = require('../db-config').createConnection(req.params.dbName);
+        var pool = createConnection(req.params.dbName);
         pool.acquire(function(err, conn) {
             if (err) {
                 console.error(err);
@@ -37,4 +39,3 @@ function getGroupsRouter(req, res, next) {
     }
 }
 
-module.exports = getGroupsRouter;

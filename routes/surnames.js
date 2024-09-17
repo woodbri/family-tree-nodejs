@@ -1,12 +1,13 @@
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '..db-config.js';
 
 /* GET Surnames listing. */
-function surnamesRouter(req, res, next) {
+export default function surnamesRouter(req, res, next) {
 
     res.locals = getHeaderInfo(req) || {};
 
     var dbName = req.params.dbName;
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
     var useDB = pool.adapter;
 
     pool.acquire(function(err, conn) {
@@ -92,4 +93,3 @@ function surnamesRouter(req, res, next) {
     pool.close();
 }
 
-module.exports = surnamesRouter;

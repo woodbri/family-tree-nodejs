@@ -1,4 +1,5 @@
-var createError = require('http-errors');
+import createError from 'http-errors';
+import createConnection from '../dn-config.js';
 
 function mediaLinkRouter(req, res, next) {
 
@@ -53,7 +54,7 @@ function mediaLinkRouter(req, res, next) {
             return;
         }
 
-        var pool = require('../db-config').createConnection(dbName);
+        var pool = createConnection(dbName);
         pool.acquire(function(err, conn) {
             if (err) {
                 console.error(err);
@@ -77,6 +78,4 @@ function mediaLinkRouter(req, res, next) {
         res.redirect('/' + dbName + '/media/edit/' + id);
     }
 }
-
-module.exports = mediaLinkRouter;
 

@@ -1,8 +1,12 @@
-var htmlEncode = require('node-htmlencode').htmlEncode;
-var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+import htmlEncodeModule from 'node-htmlencode';
+const htmlEncode = htmlEncodeModule.htmlEncode;
+import async from 'async';
+import metaphone from 'metaphone';
 
 /* GET Search Form. */
-function searchRouter(req, res, next) {
+export default function searchRouter(req, res, next) {
 
     // set some defaults
     if (typeof req.query === 'undefined' || Object.keys(req.query).length == 0) {
@@ -14,9 +18,8 @@ function searchRouter(req, res, next) {
     }
 
     res.locals = getHeaderInfo(req) || {};
-    var async = require('async');
     var dbName = req.params.dbName;
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     /*
      * req.query.string     - the search string
@@ -85,7 +88,6 @@ function searchRouter(req, res, next) {
                     params = ['%' + req.query.string + '%', '%' + req.query.string + '%'];
                     break;
                 case '2':   // fuzzy last name
-                    var metaphone = require('metaphone');
                     params = [metaphone(req.query.string).substring(0,4)];
                     sql = 'select indi, lname, fname, living from indi where lname_mp = ? order by upper(lname), upper(fname)';
                     break;
@@ -345,6 +347,4 @@ function searchRouter(req, res, next) {
         });
     }
 };
-
-module.exports = searchRouter;
 

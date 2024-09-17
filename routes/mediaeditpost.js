@@ -1,4 +1,6 @@
-function mediaEditPostRouter(req, res, next) {
+import createConnection from '../dbconfig.js';
+
+export default function mediaEditPostRouter(req, res, next) {
 
     // check if admin
     // validate date
@@ -13,7 +15,7 @@ function mediaEditPostRouter(req, res, next) {
     if (req.session && req.session.admin) {
         var date = req.body.date;
         if (date == '' || date.match(/(^\d\d\d\d(-\d\d(-\d\d)?)?)?$/)[0]) {
-            var pool = require('../db-config').createConnection(dbName);
+            var pool = createConnection(dbName);
 
             var sql = 'update photos set desc=?, "date"=?, tdate=?, title=?, gid=? where id=?';
 
@@ -53,6 +55,4 @@ function mediaEditPostRouter(req, res, next) {
         res.redirect('/' + dbName + '/media/edit/' + id);
     }
 }
-
-module.exports = mediaEditPostRouter;
 

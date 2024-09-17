@@ -1,9 +1,10 @@
 
-var async = require('async');
-var getHeaderInfo = require('../utils');
+import createConnection from '../db-config.js';
+import async from 'async';
+import getHeaderInfo from '../utils.js';
 
 /* GET descendants listing. */
-function descendantsRouter(req, res, next) {
+export default function descendantsRouter(req, res, next) {
 
     var dbName = req.params.dbName;
     var indi = req.params.indi;
@@ -11,7 +12,7 @@ function descendantsRouter(req, res, next) {
     function getDates(dbName, indi, idx) {
         return new Promise(async function(resolve, reject) {
             try {
-                var pool2 = await require('../db-config').createConnection(dbName);
+                var pool2 = await createConnection(dbName);
                 pool2.acquire(function(err, conn) {
                     var sql2 = `select a.indi, 
                             '(' || coalesce(b.date, '_______') || ' - ' || coalesce(c.date, '_______') || ')' as dates
@@ -68,7 +69,7 @@ function descendantsRouter(req, res, next) {
     if (maxGen <= 0) maxGen = 20;
     req.query.max = maxGen;
 
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
 
     var rows = [];
 
@@ -251,6 +252,4 @@ function descendantsRouter(req, res, next) {
         pool.close();
     });
 }
-
-module.exports = descendantsRouter;
 

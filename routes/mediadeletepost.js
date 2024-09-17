@@ -1,6 +1,12 @@
-var createError = require('http-errors');
+import createConnection from '../db-config.js';
+import createError from 'http-errors';
+import glob from 'glob';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-function mediaDeletePostRouter(req, res, next) {
+export default function mediaDeletePostRouter(req, res, next) {
     console.log(JSON.stringify(req.query, null, 2));
     console.log(JSON.stringify(req.params, null, 2));
     console.log(JSON.stringify(req.body, null, 2));
@@ -25,7 +31,6 @@ function mediaDeletePostRouter(req, res, next) {
         var next_id = parseInt(id) + 1;
         var url = '/' + dbName + '/media/edit/' + next_id;
 
-        var glob = require('glob');
         var file = String(id).padStart(4, '0');
         var path = __dirname + '/media/' + dbName + '/orig/' + file + '.*';
         var files = [];
@@ -47,7 +52,7 @@ function mediaDeletePostRouter(req, res, next) {
         }
         catch (e) {};
 
-        var pool = require('../db-config').createConnection(dbName);
+        var pool = createConnection(dbName);
         pool.acquire(function(err, conn) {
             if (err) {
                 console.error(err);
@@ -80,6 +85,4 @@ function mediaDeletePostRouter(req, res, next) {
         res.redirect(url);
     }
 }
-
-module.exports = mediaDeletePostRouter;
 

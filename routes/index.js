@@ -1,9 +1,11 @@
 
-var dbs = require('../db-config').databases;
-var getHeaderInfo = require('../utils');
+import { databases } from '../db-config.js';
+const dbs = databases;
+
+import getHeaderInfo from '../utils.js';
 
 /* GET home page. */
-function indexRouter(req, res, next) {
+export default function indexRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var list = [];
     for (var dbname in dbs) {
@@ -19,4 +21,3 @@ function indexRouter(req, res, next) {
     res.render('index');
 };
 
-module.exports = indexRouter;

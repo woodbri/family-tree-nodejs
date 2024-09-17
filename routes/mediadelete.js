@@ -1,5 +1,7 @@
-function mediaDeleteRouter(req, res) {
-    var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import createConnection from '../db-config.js';
+
+export default function mediaDeleteRouter(req, res) {
     res.locals = getHeaderInfo(req) || {};
     var isAdmin = res.locals.isAdmin;
     var isLogin = res.locals.isLogin;
@@ -8,7 +10,7 @@ function mediaDeleteRouter(req, res) {
     if (req.query.id && ! isNaN(parseInt(req.query.id))) {
         id = String(req.query.id);
     }
-    var pool = require('../db-config').createConnection(dbName);
+    var pool = createConnection(dbName);
     var rows = [];
 
     function getIndisFromList(list, callback) {
@@ -116,6 +118,4 @@ function mediaDeleteRouter(req, res) {
         }
     });
 }
-
-module.exports = mediaDeleteRouter;
 

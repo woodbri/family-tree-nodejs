@@ -1,13 +1,14 @@
 
-var getHeaderInfo = require('../utils');
+import json2csv from 'json2csv');
+import createConnection from '../db-config.js';
+import getHeaderInfo from '../utils.js';
 
 /* GET Birthday listing. */
-function birthdayRouter(req, res, next) {
+export default function birthdayRouter(req, res, next) {
 
     var resData = getHeaderInfo(req);
     var dbName = req.params.dbName;
-    var pool = require('../db-config').createConnection(dbName);
-    var useDB = pool.adapter;
+    var pool = createConnection(dbName);
 
     var rows = [];
 
@@ -81,7 +82,6 @@ function birthdayRouter(req, res, next) {
                 res.render('birthdays');
             }
             else {
-                const json2csv = require('json2csv');
                 const fields = ['indi', 'name', 'date'];
                 const csv = json2csv.parse(rows, {fields: fields});
                 res.setHeader('Content-disposition', 'attachment; filename=birthdays.csv');
@@ -94,5 +94,4 @@ function birthdayRouter(req, res, next) {
     pool.close();
 };
 
-module.exports = birthdayRouter;
 

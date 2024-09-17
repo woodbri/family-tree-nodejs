@@ -1,7 +1,14 @@
-function feedbackPostRouter(req, res) {
-    var getHeaderInfo = require('../utils');
+import getHeaderInfo from '../utils.js';
+import nodemailer from 'nodemailer';
+
+async function loadMailerConfig(dbName) {
+  const module = await import(`../db/${dbName}/${dbName}.cfg`);
+  const cfg = module.mailer;
+  return cfg;
+}
+
+export default function feedbackPostRouter(req, res) {
     var dbName = req.params.dbName;
-    var cfg = require('../db/' + dbName + '/' + dbName + '.cfg').mailer;
     var url = typeof req.body.ref === 'undefined' ? '/' + dbName + '/' : req.body.ref;
 
     try {
@@ -18,30 +25,31 @@ function feedbackPostRouter(req, res) {
             res.render('feedback');
             return;
         }
-        const nodemailer = require('nodemailer');
+        loadMailerConfig(dbName).then(cfg => {
 
-        // use this for mailgun and
-        // npm install nodemailer-mailgun-transport
-        //
-        //const mg = require('nodemailer-mailgun-transport');
-        //var transporter = nodemailer.createTransport(mg(cfg.mailgun));
+            // use this for mailgun and
+            // npm install nodemailer-mailgun-transport
+            //
+            //import mg from 'nodemailer-mailgun-transport';
+            //var transporter = nodemailer.createTransport(mg(cfg.mailgun));
 
-        // use this for gmail
-        var transporter = nodemailer.createTransport(cfg.gmail);
+            // use this for gmail
+            var transporter = nodemailer.createTransport(cfg.gmail);
 
-        // configure the message to send
-        var options = cfg.options;
-        options['text'] = 'From: ' + req.body.fname + "\n" +
+            // configure the message to send
+            var options = cfg.options;
+            options['text'] = 'From: ' + req.body.fname + "\n" +
             'Email: ' + req.body.femail + "\n" +
             req.body.fcomments;
 
-        transporter.sendMail(options, function(err, info) {
-            if (err) {
-                console.log(err);
-            }
-            else {
+            transporter.sendMail(options, function(err, info) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
                 //console.log('Email sent: ' + JSON.stringify(info));
-            }
+                }
+            });
         });
     }
     catch (e) {
@@ -51,4 +59,3 @@ function feedbackPostRouter(req, res) {
     res.redirect(decodeURIComponent(url));
 }
 
-module.exports = feedbackPostRouter;
