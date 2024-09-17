@@ -1,10 +1,10 @@
 import htmlEncodeiModule from 'node-htmlencode';
 const htmlEncode = htmlEncodeModule.htmlEncode;
 import getHeaderInfo from '../utils.js';
-import createConnection from '..db-config.js';
+import createConnection from '../db-config.js';
 
 /* GET a source listing. */
-function sourceRouter(req, res, next) {
+export default function sourceRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};
     var dbName = req.params.dbName;
     var sourceId = req.params.id;

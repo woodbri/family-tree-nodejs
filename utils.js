@@ -1,4 +1,4 @@
-import databases from 'db-config.js';
+import databases from './db-config.js';
 
 async function loadMailerConfig(dbName) {
   const module = await import(`../db/${dbName}/${dbName}.cfg`);

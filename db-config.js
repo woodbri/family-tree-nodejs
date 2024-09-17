@@ -1,5 +1,6 @@
+import anyDB from 'any-db';
 
-export const databases: {
+const databases = {
     woodbridge: {
         dbURL: {
             adapter: 'sqlite3',
@@ -28,19 +29,20 @@ export const databases: {
     }
 };
 
-export createConnection: function (dbName) {
+export function createConnection(dbName) {
 
-    var dbURL = dbs.databases[dbName]['dbURL'];
+    var dbURL = databases[dbName]['dbURL'];
     if (typeof dbURL === 'undefined') {
         console.error("Database '" + dbName + "' is not configured!");
         return null;
     }
 
-    var anyDB = require('any-db');
 
     var pool = anyDB.createPool(dbURL);
     pool['adapter'] = dbURL.adapter;
 
     return pool;
 }
+
+export default databases;
 

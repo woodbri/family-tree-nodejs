@@ -1,7 +1,7 @@
 import getHeaderInfo from '../utils.js';
 
 /* Display Upload form */
-function mediaUploadRouter(req, res, next) {
+export default function mediaUploadRouter(req, res, next) {
     if (req.session && req.session.admin) {
         res.locals = getHeaderInfo(req) || {};
         if (req.query && req.query.indi) {

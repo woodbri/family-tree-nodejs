@@ -1,5 +1,5 @@
 import getHeaderInfo from '../utils.js';
-import createConnection from '..db-config.js';
+import createConnection from '../db-config.js';
 
 /* GET Surnames listing. */
 export default function surnamesRouter(req, res, next) {

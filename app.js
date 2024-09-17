@@ -34,7 +34,7 @@ import mediaGroupsPostRouter from './routes/mediagroupspost.js';
 import getGroupsRouter from './routes/getgroups.js';
 import session from 'express-session';
 
-export default app = express();
+const app = express();
 
 app.use(session({
     secret: 'web-family-tree-5342aaeb',
@@ -133,3 +133,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+export default { app };

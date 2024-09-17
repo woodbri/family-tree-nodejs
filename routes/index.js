@@ -1,5 +1,5 @@
 
-import { databases } from '../db-config.js';
+import databases from '../db-config.js';
 const dbs = databases;
 
 import getHeaderInfo from '../utils.js';

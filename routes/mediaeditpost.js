@@ -1,4 +1,4 @@
-import createConnection from '../dbconfig.js';
+import createConnection from '../db-config.js';
 
 export default function mediaEditPostRouter(req, res, next) {
 

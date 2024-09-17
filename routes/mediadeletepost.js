@@ -1,6 +1,6 @@
 import createConnection from '../db-config.js';
 import createError from 'http-errors';
-import glob from 'glob';
+import { glob } from 'glob';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);

@@ -2,7 +2,7 @@ import getHeaderInfo from '../utils.js';
 import createConnection from '../db-config.js';
 import async from 'async';
 
-function mediaSummaryRouter(req, res, next) {
+export default function mediaSummaryRouter(req, res, next) {
 
     res.locals = getHeaderInfo(req) || {};
     var isAdmin = res.locals.isAdmin;

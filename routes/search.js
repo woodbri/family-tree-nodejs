@@ -3,7 +3,7 @@ import createConnection from '../db-config.js';
 import htmlEncodeModule from 'node-htmlencode';
 const htmlEncode = htmlEncodeModule.htmlEncode;
 import async from 'async';
-import metaphone from 'metaphone';
+import { metaphone } from 'metaphone';
 
 /* GET Search Form. */
 export default function searchRouter(req, res, next) {

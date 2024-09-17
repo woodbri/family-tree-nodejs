@@ -1,5 +1,5 @@
 
-import json2csv from 'json2csv');
+import json2csv from 'json2csv';
 import createConnection from '../db-config.js';
 import getHeaderInfo from '../utils.js';
 

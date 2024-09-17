@@ -1,7 +1,7 @@
 import createError from 'http-errors';
-import createConnection from '../dn-config.js';
+import createConnection from '../db-config.js';
 
-function mediaLinkRouter(req, res, next) {
+export default function mediaLinkRouter(req, res, next) {
 
     // if req.query.add
     //      'insert or ignore into indi_photos (indi, id) values(?,?)',
