@@ -1,5 +1,5 @@
 import getHeaderInfo from '../utils.js';
-import createConnection from '../db-config.js';
+import { createConnection } from '../db-config.js';
 
 import formidable from 'formidable';
 import fs from 'fs';

@@ -45,8 +45,8 @@ const __dirname = dirname(__filename);
 const app = express();
 
 async function loadDBConfig(dbName) {
-    const cfg = await import('./db/${dbName}/${dbName}.cfg');
-    return cfg;
+    const cfg = await import(`./db/${dbName}/${dbName}.js`);
+    return cfg.dbConfig;
 }
 
 app.use(session({

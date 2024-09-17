@@ -1,5 +1,5 @@
 import getHeaderInfo from '../utils.js';
-import createConnection from '../db-config.js';
+import { createConnection } from '../db-config.js';
 import async from 'async';
 
 export default function mediaSummaryRouter(req, res, next) {

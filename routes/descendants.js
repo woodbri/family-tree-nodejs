@@ -1,7 +1,7 @@
 
-import createConnection from '../db-config.js';
-import async from 'async';
 import getHeaderInfo from '../utils.js';
+import { createConnection } from '../db-config.js';
+import async from 'async';
 
 /* GET descendants listing. */
 export default function descendantsRouter(req, res, next) {

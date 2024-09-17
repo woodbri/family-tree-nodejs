@@ -1,5 +1,5 @@
 import getHeaderInfo from '../utils.js';
-import createConnection from '../db-config.js';
+import { createConnection } from '../db-config.js';
 
 export default function mediaListRouter(req, res, next) {
     res.locals = getHeaderInfo(req) || {};

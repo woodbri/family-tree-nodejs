@@ -1,7 +1,7 @@
 
-import json2csv from 'json2csv';
-import createConnection from '../db-config.js';
 import getHeaderInfo from '../utils.js';
+import { createConnection } from '../db-config.js';
+import json2csv from 'json2csv';
 
 /* GET Birthday listing. */
 export default function birthdayRouter(req, res, next) {

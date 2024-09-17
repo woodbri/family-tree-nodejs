@@ -1,5 +1,5 @@
+import { createConnection } from '../db-config.js';
 import createError from 'http-errors';
-import createConnection from '../db-config.js';
 
 export default function mediaLinkRouter(req, res, next) {
 

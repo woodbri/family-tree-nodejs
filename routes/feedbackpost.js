@@ -2,7 +2,7 @@ import getHeaderInfo from '../utils.js';
 import nodemailer from 'nodemailer';
 
 async function loadMailerConfig(dbName) {
-  const module = await import(`../db/${dbName}/${dbName}.cfg`);
+  const module = await import(`../db/${dbName}/${dbName}.js`);
   const cfg = module.mailer;
   return cfg;
 }

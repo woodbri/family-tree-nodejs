@@ -1,5 +1,5 @@
-import createConnection from '../db-config.js';
 import getHeaderInfo from '../utils.js';
+import { createConnection } from '../db-config.js';
 
 const fileext = {
     jpeg: '.jpg',

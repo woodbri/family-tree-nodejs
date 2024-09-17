@@ -1,4 +1,4 @@
-import createConnection from '../db-config.js';
+import { createConnection } from '../db-config.js';
 import createError from 'http-errors';
 import { glob } from 'glob';
 import { dirname } from 'path';

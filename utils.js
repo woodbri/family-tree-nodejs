@@ -1,9 +1,8 @@
 import databases from './db-config.js';
 
-async function loadMailerConfig(dbName) {
-  const module = await import(`../db/${dbName}/${dbName}.cfg`);
-  const cfg = module.mailer;
-  return cfg;
+async function loadDBConfig(dbName) {
+  const cfg = await import(`./db/${dbName}/${dbName}.js`);
+  return cfg.dbConfig;
 }
 
 export default function getHeaderInfo(req) {
@@ -25,7 +24,7 @@ export default function getHeaderInfo(req) {
         try {
             dbinfo = databases[dbname].params;
 
-            loadMailerConfig(dbname).then(cfg => {
+            loadDBConfig(dbname).then(cfg => {
                 requireLoginForFeedback = cfg.requireLoginForFeedback;
 	    });
         }

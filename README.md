@@ -79,10 +79,10 @@ the other.
 Databases are stored in ./db/&lt;dbname&gt;/&lt;dbname&gt;.\*. There are typically 3 files here:
 
 * &lt;dbname&gt;.db - the sqlite database
-* &lt;dbname&gt;.cfg - database specific configuration information
+* &lt;dbname&gt;.js - database specific configuration information
 * &lt;dbname&gt;.about - html about this database that gets displayed as part of the home page for this database
 
-To load a GEDCOM file, run these commands and then edit mygedcom.cfg (see below for details) and mygedcom.about as appropriate for your GEDCOM:
+To load a GEDCOM file, run these commands and then edit mygedcom.js (see below for details) and mygedcom.about as appropriate for your GEDCOM:
 
 ```
 bin/load-gedcom < path/to/mygedcom.ged
@@ -90,7 +90,7 @@ bin/build-graphdb
 mkdir -p db/mygedcom
 mv test.db db/mygedcom/mygedcom.db
 mv graphdb.json db/mygedcom/mygedcom.json
-cp sample-db.cfg db/mygedcom/mygedcom.cfg
+cp sample-db.js db/mygedcom/mygedcom.js
 cp sample-db.about db/mygedcom/mygedcom.about
 ```
 
@@ -177,8 +177,8 @@ The software will compute if people are living based on the following rules:
 This is used to hide people in your database that are presumed living unless the user
 has logged into the system. Logged in users can see everything.
 
-Users are configured with static logins configured in the db/&lt;dbname&gt;/&lt;dbname&gt;.cfg file
-in the database directory. the sample-db.cfg you copied has a default user "test" with a password "test", CHANGE THIS!, in the auth section of that file. The admin flag is
+Users are configured with static logins configured in the db/&lt;dbname&gt;/&lt;dbname&gt;.js file
+in the database directory. the sample-db.js you copied has a default user "test" with a password "test", CHANGE THIS!, in the auth section of that file. The admin flag is
 required if you want to allow this user to upload, edit and manage photos associated with
 your family tree.
 
@@ -262,7 +262,7 @@ find-relationship:  { iter: 5619,
 
 ## File Structure
 
-The sqlite databases are stored in ``./db/&lt;DBName&gt;/`` along with its cfg and about
+The sqlite databases are stored in ``./db/&lt;DBName&gt;/`` along with its .js and .about
 files. If you are using the Photo management options the photos are stored in
 ``./media/&lt;DBName&gt;/`` and photo attributes are stored in the respective database.
 
@@ -271,10 +271,10 @@ files. If you are using the Photo management options the photos are stored in
 ./bin/load-gedcom
 ./bin/www
 ./db/woodbridge/woodbridge.about
-./db/woodbridge/woodbridge.cfg
+./db/woodbridge/woodbridge.js
 ./db/woodbridge/woodbridge.db
 ./db/woodbridge_record/woodbridge_record.about
-./db/woodbridge_record/woodbridge_record.cfg
+./db/woodbridge_record/woodbridge_record.js
 ./db/woodbridge_record/woodbridge_record.db
 ./db-config.js
 ./LICENSE
@@ -314,7 +314,7 @@ files. If you are using the Photo management options the photos are stored in
 ./routes/source.js
 ./routes/surnames.js
 ./sample-db.about
-./sample-db.cfg
+./sample-db.js
 ./schema.txt
 ./schema-photos.txt
 ./start

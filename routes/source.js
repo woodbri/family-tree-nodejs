@@ -1,6 +1,6 @@
-import { encode } from 'html-entities';
 import getHeaderInfo from '../utils.js';
-import createConnection from '../db-config.js';
+import { createConnection } from '../db-config.js';
+import { encode } from 'html-entities';
 
 /* GET a source listing. */
 export default function sourceRouter(req, res, next) {
