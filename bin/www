@@ -4,8 +4,7 @@
  * Module dependencies.
  */
 
-import wwwApp from '../app.js';
-const { app } = wwwApp;
+import app from '../app.js';
 import createDebug from 'debug';
 const debug = createDebug('family-tree-nodejs:server');
 import http from 'http';
